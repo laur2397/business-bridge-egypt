@@ -1,37 +1,32 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import { createAmbience } from './audio.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Lazy scene modules (code-split; missing module => graceful fallback)
-const scenes = import.meta.glob(['./scene/hero.js', './scene/globe.js']);
-const loadScene = (name) => {
-  const loader = scenes[`./scene/${name}.js`];
-  if (!loader) return Promise.reject(new Error(`${name} module missing`));
-  return loader();
-};
+// Lazy 3D modules (code-split; a missing or failing module falls back gracefully)
+const modules = import.meta.glob(['./film/engine.js', './showcase/monoliths.js', './showcase/bridgebuild.js']);
+const load = (path) => (modules[path] ? modules[path]() : Promise.reject(new Error(`${path} missing`)));
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const coarse = window.matchMedia('(pointer: coarse)').matches;
-const isSmall = () => window.innerWidth < 900;
 const quality = coarse || window.innerWidth < 900 || (navigator.hardwareConcurrency || 8) <= 4 ? 'low' : 'high';
 if (reduced) document.documentElement.classList.add('reduced');
-
 document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
 
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 /* Smooth scroll                                                       */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 let lenis = null;
 if (!reduced) {
-  lenis = new Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
+  lenis = new Lenis({ duration: 1.25, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true, wheelMultiplier: 0.85 });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
   lenis.stop();
 }
-
+const burger = document.querySelector('.nav__burger');
 document.querySelectorAll('a[href^="#"]').forEach((a) => {
   a.addEventListener('click', (e) => {
     const id = a.getAttribute('href');
@@ -41,19 +36,18 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
     document.body.classList.remove('menu-open');
     burger?.setAttribute('aria-expanded', 'false');
     burger?.setAttribute('aria-label', 'Open menu');
-    // Lenis is stopped while the mobile menu is open; scrollTo is ignored when stopped
-    if (lenis) { lenis.start(); lenis.scrollTo(target, { offset: 0, duration: 1.6 }); }
+    if (lenis) { lenis.start(); lenis.scrollTo(target, { duration: 1.8 }); }
     else if (target === 0) window.scrollTo(0, 0);
     else target.scrollIntoView();
   });
 });
 
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 /* Text splitting                                                      */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 function splitWords(el) {
   const frag = document.createDocumentFragment();
-  const walk = (node, wrapperTag) => {
+  const walk = (node, tag) => {
     node.childNodes.forEach((child) => {
       if (child.nodeType === 3) {
         child.textContent.split(/(\s+)/).forEach((part) => {
@@ -61,16 +55,15 @@ function splitWords(el) {
           if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
           const outer = document.createElement('span');
           outer.className = 'split-line';
-          outer.style.display = 'inline-block';
-          outer.style.verticalAlign = 'top';
-          const inner = document.createElement(wrapperTag || 'span');
+          outer.style.cssText = 'display:inline-block;vertical-align:top';
+          const inner = document.createElement(tag || 'span');
           inner.textContent = part;
           outer.appendChild(inner);
           frag.appendChild(outer);
         });
-      } else if (child.nodeType === 1) {
-        walk(child, child.tagName.toLowerCase());
-      }
+      } else if (child.nodeType === 1 && child.tagName === 'BR') {
+        frag.appendChild(document.createElement('br'));
+      } else if (child.nodeType === 1) walk(child, child.tagName.toLowerCase());
     });
   };
   walk(el, null);
@@ -78,175 +71,299 @@ function splitWords(el) {
   el.appendChild(frag);
   return el.querySelectorAll('.split-line > *');
 }
-
 const splitEls = [...document.querySelectorAll('[data-split]')].map((el) => ({ el, words: splitWords(el) }));
 
-/* ------------------------------------------------------------------ */
-/* Preloader → intro                                                   */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
+/* Film                                                                */
+/* ================================================================== */
+const filmEl = document.querySelector('.film');
+const filmMount = filmEl.querySelector('.film__gl');
+const cards = [...filmEl.querySelectorAll('.card')].map((el) => {
+  const [a, b] = el.dataset.range.split(',').map(Number);
+  const title = el.querySelector('.card__title, .finale__line, .card__coords');
+  // kinetic typography: split titles into characters grouped by word
+  if (title) {
+    const words = [];
+    const walk = (node, wrapTag) => {
+      [...node.childNodes].forEach((child) => {
+        if (child.nodeType === 3) {
+          const parts = child.textContent.split(/(\s+)/);
+          const f = document.createDocumentFragment();
+          parts.forEach((part) => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { f.appendChild(document.createTextNode(' ')); return; }
+            const w = document.createElement('span'); w.style.cssText = 'display:inline-block;white-space:nowrap';
+            [...part].forEach((ch) => { const c = document.createElement('span'); c.className = 'char'; c.textContent = ch; w.appendChild(c); });
+            words.push(w);
+            if (wrapTag) { const t = document.createElement(wrapTag); t.appendChild(w); f.appendChild(t); } else f.appendChild(w);
+          });
+          node.replaceChild(f, child);
+        } else if (child.nodeType === 1 && child.tagName !== 'BR') {
+          // flatten <em> into styled spans so characters can animate individually
+          if (child.tagName === 'EM') { walk(child, null); } else walk(child, null);
+        }
+      });
+    };
+    walk(title, null);
+  }
+  return { el, a, b, chars: el.querySelectorAll('.char'), rest: el.querySelectorAll('.eyebrow, .card__sub, .hero__ctas'), on: false };
+});
+
+const hud = {
+  chapter: filmEl.querySelector('.hud__chapter'),
+  tc: filmEl.querySelector('.hud__tc'),
+  coord: filmEl.querySelector('.hud__coord'),
+  rail: [...filmEl.querySelectorAll('.film__rail span')],
+  hint: filmEl.querySelector('.film__hint'),
+};
+const CHAPTERS = [
+  { at: 0, name: 'I · The World', coord: 'Orbit · 400 km · 22.0° N 31.2° E' },
+  { at: 0.37, name: 'II · Descent', coord: 'Altitude 3,200 m · Nile Delta' },
+  { at: 0.48, name: 'III · The River', coord: 'The Nile · Cairo · 30.04° N 31.24° E' },
+  { at: 0.7, name: 'IV · The Bridge', coord: 'Golden hour → blue hour' },
+  { at: 0.88, name: 'V · Act', coord: 'Cairo · Night' },
+];
+let currentChapter = -1;
+const ambience = createAmbience();
+
+function showCard(c) {
+  c.on = true;
+  c.el.classList.add('is-on');
+  gsap.killTweensOf([c.el, c.chars, c.rest]);
+  gsap.set(c.el, { autoAlpha: 1 });
+  if (reduced) { gsap.set([c.chars, c.rest], { opacity: 1, clearProps: 'transform,filter' }); return; }
+  gsap.fromTo(c.chars, { opacity: 0, yPercent: 40, filter: 'blur(14px)', letterSpacing: '0.12em' },
+    { opacity: 1, yPercent: 0, filter: 'blur(0px)', letterSpacing: '0em', duration: 1.4, ease: 'expo.out', stagger: { each: 0.018, from: 'start' } });
+  gsap.fromTo(c.rest, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1.2, ease: 'expo.out', stagger: 0.1, delay: 0.25 });
+}
+function hideCard(c) {
+  c.on = false;
+  c.el.classList.remove('is-on');
+  gsap.killTweensOf([c.el, c.chars, c.rest]);
+  if (reduced) { gsap.set(c.el, { autoAlpha: 0 }); return; }
+  gsap.to(c.chars, { opacity: 0, filter: 'blur(10px)', yPercent: -30, duration: 0.6, ease: 'power2.in', stagger: { each: 0.008, from: 'end' } });
+  gsap.to(c.rest, { opacity: 0, y: -16, duration: 0.5, ease: 'power2.in' });
+  gsap.to(c.el, { autoAlpha: 0, duration: 0.2, delay: 0.6 });
+}
+
+function pad2(n) { return String(Math.floor(n)).padStart(2, '0'); }
+let film = null;
+let filmProgress = 0;
+
+function updateFilmUI(f) {
+  filmProgress = f;
+  cards.forEach((c) => {
+    const inside = f >= c.a && f < c.b;
+    if (inside && !c.on) showCard(c); else if (!inside && c.on) hideCard(c);
+  });
+  let idx = 0;
+  CHAPTERS.forEach((ch, i) => { if (f >= ch.at) idx = i; });
+  if (idx !== currentChapter) {
+    currentChapter = idx;
+    hud.chapter.textContent = CHAPTERS[idx].name;
+    hud.coord.textContent = CHAPTERS[idx].coord;
+    hud.rail.forEach((r, i) => r.classList.toggle('is-on', i === idx));
+    ambience.chime(idx);
+  }
+  // 24 fps timecode over a ~3-minute "film"
+  const secs = f * 180;
+  hud.tc.textContent = `00:${pad2(secs / 60)}:${pad2(secs % 60)}:${pad2((secs * 24) % 24)}`;
+  hud.hint.style.opacity = f > 0.02 ? 0 : 1;
+  filmEl.classList.toggle('is-ended', f > 0.965);
+  ambience.update(f);
+}
+
+ScrollTrigger.create({
+  trigger: filmEl, start: 'top top', end: 'bottom bottom', scrub: true,
+  onUpdate: (self) => { film?.setProgress(self.progress); updateFilmUI(self.progress); },
+});
+ScrollTrigger.create({ trigger: filmEl, start: 'bottom bottom', end: 'bottom top', onUpdate: (s) => ambience.update(1 + s.progress) });
+
+// Sound toggle
+const soundBtn = filmEl.querySelector('.sound');
+soundBtn.addEventListener('click', async () => {
+  const on = await ambience.toggle();
+  soundBtn.setAttribute('aria-pressed', String(on));
+  soundBtn.setAttribute('aria-label', on ? 'Turn ambient sound off' : 'Turn ambient sound on');
+  soundBtn.querySelector('.sound__label').textContent = on ? 'Sound on' : 'Sound off';
+  ambience.update(filmProgress);
+});
+
+/* ================================================================== */
+/* Opening titles (preloader) → film                                    */
+/* ================================================================== */
 const pre = document.querySelector('.preloader');
 const preBar = pre.querySelector('.preloader__bar span');
 const preCount = pre.querySelector('.preloader__count');
-const preMark = pre.querySelector('.preloader__mark');
-const loadState = { v: 0 };
-let heroReady = false;
+const load01 = { real: 0, shown: 0 };
+const titles = gsap.timeline();
+titles.to('.preloader__arc path', { strokeDashoffset: 0, duration: 2.2, ease: 'power2.inOut' })
+  .to('.preloader__presents', { opacity: 1, letterSpacing: '0.24em', duration: 1.6, ease: 'power2.out' }, 0.9);
+const loadTicker = () => {
+  load01.shown += (Math.min(load01.real, 0.98) - load01.shown) * 0.08;
+  preBar.style.transform = `scaleX(${load01.shown})`;
+  preCount.textContent = String(Math.round(load01.shown * 100)).padStart(3, '0');
+};
+gsap.ticker.add(loadTicker);
 
-gsap.to(preMark, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.inOut', delay: 0.15 });
-const loadTween = gsap.to(loadState, {
-  v: 88, duration: 2.2, ease: 'power2.out',
-  onUpdate: () => {
-    preBar.style.transform = `scaleX(${loadState.v / 100})`;
-    preCount.textContent = String(Math.round(loadState.v)).padStart(3, '0');
-  },
-});
-
-let loadingFinished = false;
+let finished = false;
 function finishLoading() {
-  // Guard: the 7s safety timer and initHero() can both call this; a second intro
-  // timeline would capture mid-animation values and leave hero elements at opacity 0.
-  if (loadingFinished) return;
-  loadingFinished = true;
-  loadTween.kill();
-  gsap.timeline()
-    .to(loadState, {
-      v: 100, duration: 0.6, ease: 'power2.inOut',
-      onUpdate: () => {
-        preBar.style.transform = `scaleX(${loadState.v / 100})`;
-        preCount.textContent = String(Math.round(loadState.v)).padStart(3, '0');
-      },
-    })
-    .to(pre.querySelector('.preloader__inner'), { opacity: 0, y: -20, duration: 0.6, ease: 'power3.in' }, '+=0.1')
-    .to(pre.querySelector('.preloader__curtain'), { scaleY: 1, duration: 0.8, ease: 'expo.inOut' }, '-=0.2')
-    .set(pre.querySelector('.preloader__curtain'), { transformOrigin: 'top' })
-    .to(pre, { autoAlpha: 0, duration: 0.01 })
+  if (finished) return;
+  finished = true;
+  gsap.ticker.remove(loadTicker);
+  const tl = gsap.timeline({ delay: Math.max(0, 2.4 - titles.time()) });
+  tl.to(load01, { shown: 1, duration: 0.5, onUpdate: () => { preBar.style.transform = `scaleX(${load01.shown})`; preCount.textContent = String(Math.round(load01.shown * 100)).padStart(3, '0'); } })
+    .to('.preloader__inner', { opacity: 0, filter: 'blur(8px)', duration: 0.9, ease: 'power2.in' }, '+=0.2')
+    .to(pre, { autoAlpha: 0, duration: 1.4, ease: 'power2.inOut' }, '-=0.2')
     .add(() => {
       document.body.classList.remove('is-loading');
       lenis?.start();
       ScrollTrigger.refresh();
-      introHero();
-    }, '-=0.05');
+      updateFilmUI(0);
+      if (!reduced) gsap.from('.nav, .hud', { opacity: 0, duration: 1.6, ease: 'power2.out', clearProps: 'opacity' });
+    }, '-=0.8');
 }
 
-function introHero() {
-  const hero = splitEls.find((s) => s.el.classList.contains('hero__title'));
-  const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-  if (hero) tl.from(hero.words, { yPercent: 115, rotate: 3, duration: 1.5, stagger: 0.06 }, 0);
-  tl.from('[data-hero-in]', { y: 30, opacity: 0, duration: 1.3, stagger: 0.12 }, 0.35)
-    .from('.nav', { y: -40, opacity: 0, duration: 1.2, clearProps: 'transform,opacity' }, 0.5)
-    .from('.hero__coords, .hero__phase, .hero__scroll', { opacity: 0, duration: 1.4 }, 0.8);
-}
-
-/* ------------------------------------------------------------------ */
-/* Hero WebGL                                                          */
-/* ------------------------------------------------------------------ */
-const heroMount = document.querySelector('.hero__canvas');
-const heroFallback = document.querySelector('.hero__fallback');
-let hero = null;
-
-async function initHero() {
+async function initFilm() {
   try {
-    const mod = await loadScene('hero');
-    hero = mod.createHeroScene(heroMount, { quality });
-    await Promise.race([hero.ready, new Promise((r) => setTimeout(r, 6000))]);
-    gsap.to(heroFallback, { opacity: 0, duration: 1.2, ease: 'power2.out' });
+    const { createFilm } = await load('./film/engine.js');
+    film = createFilm(filmMount, { quality, reduced, onProgress: (l, t) => { load01.real = t ? l / t : 0; } });
+    await Promise.race([film.ready, new Promise((_, rej) => setTimeout(() => rej(new Error('film timeout')), 25000))]);
+    filmEl.classList.add('is-gl');
   } catch (err) {
-    console.warn('[hero] WebGL scene unavailable, using fallback.', err?.message || err);
+    console.warn('[film] using fallback:', err?.message || err);
   }
-  heroReady = true;
   finishLoading();
 }
-// Safety: never keep the user waiting more than ~7 seconds
-setTimeout(() => { if (!heroReady) { heroReady = true; finishLoading(); } }, 7000);
-initHero();
+setTimeout(finishLoading, 28000);
+initFilm();
 
-const phaseBars = document.querySelectorAll('.hero__phase i');
-ScrollTrigger.create({
-  trigger: '.hero',
-  start: 'top top',
-  end: 'bottom bottom',
-  scrub: true,
-  onUpdate: (self) => {
-    const p = self.progress;
-    hero?.setProgress(p);
-    phaseBars.forEach((b, i) => { b.style.transform = `scaleY(${gsap.utils.clamp(0, 1, p * 4 - i)})`; });
-  },
-});
-if (!reduced) {
-  gsap.to('.hero__content', {
-    yPercent: -18, opacity: 0, ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: '28% top', scrub: true },
-  });
-  gsap.timeline({ scrollTrigger: { trigger: '.hero', start: '45% top', end: 'bottom bottom', scrub: true } })
-    .fromTo('.hero__outro', { opacity: 0, y: 40, filter: 'blur(12px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', ease: 'power2.out', duration: 0.6 })
-    .to('.hero__outro', { opacity: 1, duration: 0.4 });
-}
-
-/* ------------------------------------------------------------------ */
-/* Globe                                                               */
-/* ------------------------------------------------------------------ */
-const globeMount = document.querySelector('.reach__globe-canvas');
-let globe = null;
-let globeLoading = false;
-async function initGlobe() {
-  if (globe || globeLoading) return;
-  globeLoading = true;
-  try {
-    const mod = await loadScene('globe');
-    globe = mod.createGlobe(globeMount, { quality });
-    await globe.ready;
-    gsap.to('.reach__globe-fallback', { opacity: 0, duration: 1 });
-    globe.setProgress(globeProgress);
-  } catch (err) {
-    console.warn('[globe] unavailable, using fallback.', err?.message || err);
-  }
-}
-let globeProgress = 0;
-ScrollTrigger.create({ trigger: '.reach', start: 'top 160%', once: true, onEnter: initGlobe });
-ScrollTrigger.create({
-  trigger: '.reach', start: 'top top', end: 'bottom bottom', scrub: true,
-  onUpdate: (self) => { globeProgress = self.progress; globe?.setProgress(self.progress); },
-});
-const regionBtns = document.querySelectorAll('[data-region]');
-regionBtns.forEach((btn) => {
-  const on = () => { regionBtns.forEach((b) => b.classList.toggle('is-active', b === btn)); globe?.focus?.(btn.dataset.region); };
-  const off = () => { btn.classList.remove('is-active'); globe?.focus?.(null); };
-  btn.addEventListener('mouseenter', on);
-  btn.addEventListener('focus', on);
-  btn.addEventListener('mouseleave', off);
-  btn.addEventListener('blur', off);
-  btn.addEventListener('click', on);
-});
-
-/* pointer parallax shared */
 if (!coarse && !reduced) {
   window.addEventListener('pointermove', (e) => {
     const x = (e.clientX / window.innerWidth) * 2 - 1;
     const y = (e.clientY / window.innerHeight) * 2 - 1;
-    hero?.setPointer?.(x, y);
-    globe?.setPointer?.(x, y);
+    film?.setPointer(x, y);
+    hall?.setPointer?.(x, y);
+    bridge?.setPointer?.(x, y);
   }, { passive: true });
 }
 
-/* ------------------------------------------------------------------ */
-/* Generic reveals                                                     */
-/* ------------------------------------------------------------------ */
-splitEls.forEach(({ el, words }) => {
-  if (el.classList.contains('hero__title')) return;
-  if (reduced) return;
-  gsap.from(words, {
-    yPercent: 115, rotate: 2, duration: 1.4, ease: 'expo.out', stagger: 0.045,
-    scrollTrigger: { trigger: el, start: 'top 85%' },
-  });
+/* ================================================================== */
+/* Hall of monoliths (services)                                        */
+/* ================================================================== */
+const hallEl = document.querySelector('.hall');
+const hallItems = [...hallEl.querySelectorAll('.hall__item')];
+const hallBtns = [...hallEl.querySelectorAll('[data-goto]')];
+let hall = null;
+let activeService = -1;
+
+function setService(i) {
+  if (i === activeService) return;
+  const prev = hallItems[activeService];
+  activeService = i;
+  const next = hallItems[i];
+  hallBtns.forEach((b, k) => b.classList.toggle('is-on', k === i));
+  hall?.setActive?.(i);
+  if (prev) {
+    prev.classList.remove('is-active');
+    gsap.to(prev, { autoAlpha: 0, y: -30, filter: 'blur(8px)', duration: reduced ? 0 : 0.5, ease: 'power2.in' });
+  }
+  next.classList.add('is-active');
+  gsap.fromTo(next, { autoAlpha: 0, y: 40, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: reduced ? 0 : 1.1, ease: 'expo.out', delay: reduced ? 0 : 0.25 });
+  if (!reduced) gsap.from(next.querySelectorAll('li'), { opacity: 0, x: -16, duration: 0.8, ease: 'expo.out', stagger: 0.06, delay: 0.5 });
+}
+gsap.set(hallItems, { autoAlpha: 0 });
+setService(0);
+
+ScrollTrigger.create({
+  trigger: hallEl, start: 'top top', end: 'bottom bottom', scrub: true,
+  onUpdate: (self) => {
+    const p = self.progress;
+    hall?.setProgress(p);
+    gsap.set('.hall__progress i', { scaleX: p });
+    setService(Math.min(7, Math.floor(p * 8 * 0.999)));
+  },
+});
+hallBtns.forEach((b, i) => b.addEventListener('click', () => {
+  const st = ScrollTrigger.getAll().find((s) => s.trigger === hallEl);
+  if (!st) return;
+  const y = st.start + (st.end - st.start) * ((i + 0.5) / 8);
+  if (lenis) lenis.scrollTo(y, { duration: 1.4 }); else window.scrollTo(0, y);
+}));
+ScrollTrigger.create({
+  trigger: hallEl, start: 'top 250%', once: true,
+  onEnter: async () => {
+    try {
+      const { createMonoliths } = await load('./showcase/monoliths.js');
+      hall = createMonoliths(hallEl.querySelector('.hall__gl'), { quality });
+      await hall.ready;
+      hall.setActive?.(Math.max(0, activeService));
+      gsap.to(hallEl.querySelector('.hall__fallback'), { opacity: 0, duration: 1.2 });
+    } catch (err) { console.warn('[monoliths] fallback:', err?.message || err); }
+  },
 });
 
+/* ================================================================== */
+/* Method — the bridge builds itself                                   */
+/* ================================================================== */
+const methodEl = document.querySelector('.method');
+const steps = [...methodEl.querySelectorAll('.mstep')];
+const stepsWrap = methodEl.querySelector('.method__steps');
+let bridge = null;
+let methodP = 0;
+const STEP_AT = [0.25, 0.5, 0.75, 0.95];
+ScrollTrigger.create({
+  trigger: methodEl, start: 'top top', end: 'bottom bottom', scrub: true,
+  onUpdate: (self) => {
+    methodP = self.progress;
+    bridge?.setProgress(methodP);
+    if (bridge) steps.forEach((s, i) => s.classList.toggle('is-on', methodP >= STEP_AT[i] - 0.03));
+  },
+});
+function placeSteps() {
+  if (bridge?.getNodeScreenPositions) {
+    const pts = bridge.getNodeScreenPositions();
+    const r = methodEl.querySelector('.method__stage').getBoundingClientRect();
+    pts.forEach((pt, i) => {
+      if (!steps[i] || !pt) return;
+      steps[i].style.left = `${pt.x * r.width}px`;
+      steps[i].style.top = `${pt.y * r.height + 34}px`;
+    });
+  }
+  requestAnimationFrame(placeSteps);
+}
+ScrollTrigger.create({
+  trigger: methodEl, start: 'top 250%', once: true,
+  onEnter: async () => {
+    try {
+      const { createBridgeBuild } = await load('./showcase/bridgebuild.js');
+      bridge = createBridgeBuild(methodEl.querySelector('.method__gl'), { quality });
+      await bridge.ready;
+      bridge.setProgress(methodP);
+      gsap.to(methodEl.querySelector('.method__fallback'), { opacity: 0, duration: 1.2 });
+      placeSteps();
+    } catch (err) {
+      console.warn('[bridge] fallback:', err?.message || err);
+      stepsWrap.classList.add('is-static');
+    }
+  },
+});
+// If the 3D module never arrives, show the steps statically.
+setTimeout(() => { if (!bridge) stepsWrap.classList.add('is-static'); }, 30000);
+
+/* ================================================================== */
+/* Generic reveals                                                     */
+/* ================================================================== */
+splitEls.forEach(({ el, words }) => {
+  if (reduced) return;
+  gsap.from(words, { yPercent: 115, rotate: 2, duration: 1.4, ease: 'expo.out', stagger: 0.045, scrollTrigger: { trigger: el, start: 'top 85%' } });
+});
 if (!reduced) {
   ScrollTrigger.batch('[data-fade]', {
     start: 'top 88%',
     onEnter: (els) => gsap.to(els, { opacity: 1, y: 0, duration: 1.2, ease: 'expo.out', stagger: 0.08, overwrite: true }),
   });
 }
-
-/* Manifesto word scrub */
 const manifesto = document.querySelector('[data-words]');
 if (manifesto) {
   const html = [];
@@ -257,134 +374,17 @@ if (manifesto) {
   manifesto.innerHTML = html.join(' ');
   const ws = manifesto.querySelectorAll('.w');
   if (reduced) gsap.set(ws, { opacity: 1 });
-  else gsap.to(ws, {
-    opacity: 1, stagger: 0.1, ease: 'none',
-    scrollTrigger: { trigger: manifesto, start: 'top 78%', end: 'bottom 45%', scrub: 0.6 },
-  });
+  else gsap.to(ws, { opacity: 1, stagger: 0.1, ease: 'none', scrollTrigger: { trigger: manifesto, start: 'top 78%', end: 'bottom 45%', scrub: 0.6 } });
 }
-
-/* Counters */
 document.querySelectorAll('[data-count]').forEach((el) => {
   const target = parseFloat(el.dataset.count);
   const dec = parseInt(el.dataset.decimals || '0', 10);
   const o = { v: 0 };
-  const fmt = (v) => v.toFixed(dec);
-  if (reduced) { el.textContent = fmt(target); return; }
-  ScrollTrigger.create({
-    trigger: el, start: 'top 90%', once: true,
-    onEnter: () => gsap.to(o, { v: target, duration: 2.4, ease: 'expo.out', onUpdate: () => (el.textContent = fmt(o.v)) }),
-  });
+  if (reduced) { el.textContent = target.toFixed(dec); return; }
+  ScrollTrigger.create({ trigger: el, start: 'top 90%', once: true, onEnter: () => gsap.to(o, { v: target, duration: 2.4, ease: 'expo.out', onUpdate: () => (el.textContent = o.v.toFixed(dec)) }) });
 });
 
-/* ------------------------------------------------------------------ */
-/* Services — horizontal pinned scroll (desktop)                       */
-/* ------------------------------------------------------------------ */
-const mm = gsap.matchMedia();
-const track = document.querySelector('.services__track');
-const cards = [...track.querySelectorAll('.svc:not(.svc--intro)')];
-const countEl = document.querySelector('.services__count .cur');
-
-mm.add('(min-width: 901px)', () => {
-  const dist = () => track.scrollWidth - window.innerWidth;
-  const tween = gsap.to(track, {
-    x: () => -dist(), ease: 'none',
-    scrollTrigger: {
-      trigger: '.services__pin', start: 'top top', end: () => `+=${dist()}`,
-      pin: true, scrub: reduced ? true : 0.8, invalidateOnRefresh: true, anticipatePin: 1,
-      onUpdate: (self) => {
-        gsap.set('.services__progress i', { scaleX: self.progress });
-        const idx = Math.min(cards.length, Math.max(1, Math.round(self.progress * (cards.length - 1)) + 1));
-        countEl.textContent = String(idx).padStart(2, '0');
-      },
-    },
-  });
-  if (!reduced) {
-    cards.forEach((card) => {
-      gsap.from(card, {
-        rotateY: -18, z: -120, opacity: 0.25, ease: 'none',
-        scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 100%', end: 'left 55%', scrub: true },
-      });
-      gsap.from(card.querySelector('.svc__num'), {
-        xPercent: 40, ease: 'none',
-        scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 100%', end: 'right 0%', scrub: true },
-      });
-    });
-  }
-  return () => gsap.set(track, { clearProps: 'transform' });
-});
-
-mm.add('(max-width: 900px)', () => {
-  if (reduced) return;
-  cards.forEach((card) => gsap.from(card, { y: 60, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: card, start: 'top 90%' } }));
-});
-
-/* Card hover glow + tilt */
-if (!coarse && !reduced) {
-  cards.forEach((card) => {
-    card.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width;
-      const y = (e.clientY - r.top) / r.height;
-      card.style.setProperty('--mx', `${x * 100}%`);
-      card.style.setProperty('--my', `${y * 100}%`);
-      gsap.to(card, { rotateX: (0.5 - y) * 6, rotateY: (x - 0.5) * 8, transformPerspective: 900, duration: 0.6, ease: 'power3.out' });
-    });
-    card.addEventListener('pointerleave', () => gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.9, ease: 'power3.out' }));
-  });
-}
-
-/* ------------------------------------------------------------------ */
-/* Method — bridge drawn on scroll                                     */
-/* ------------------------------------------------------------------ */
-(function methodBridge() {
-  const svg = document.querySelector('.method__bridge svg');
-  if (!svg) return;
-  const NS = 'http://www.w3.org/2000/svg';
-  const arch = svg.querySelector('.m-arch');
-  const deck = svg.querySelector('.m-deck');
-  const hangersG = svg.querySelector('.m-hangers');
-  const nodesG = svg.querySelector('.m-nodes');
-  const len = arch.getTotalLength();
-  const yAt = (x) => {
-    let lo = 0, hi = len;
-    for (let i = 0; i < 30; i++) { const mid = (lo + hi) / 2; if (arch.getPointAtLength(mid).x < x) lo = mid; else hi = mid; }
-    return arch.getPointAtLength(lo).y;
-  };
-  const hangers = [];
-  for (let x = 110; x <= 1170; x += 35) {
-    const l = document.createElementNS(NS, 'line');
-    const y = yAt(x);
-    l.setAttribute('x1', x); l.setAttribute('x2', x); l.setAttribute('y1', y); l.setAttribute('y2', 330);
-    hangersG.appendChild(l); hangers.push(l);
-  }
-  const nodeXs = [160, 480, 800, 1120];
-  const icons = ['M-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0M5 5l6 6', 'M-8 0h16M0-8v16', 'M-8-6h16M-8 0h16M-8 6h16', 'M-6 0h12M2-6l6 6-6 6'];
-  const nodes = nodeXs.map((x, i) => {
-    const g = document.createElementNS(NS, 'g');
-    const y = yAt(x);
-    g.setAttribute('transform', `translate(${x} ${y})`);
-    g.innerHTML = `<circle r="46" fill="url(#nodeGlow)" class="ng" opacity="0"/><circle r="26" fill="#08173a" stroke="${i === 3 ? '#d9b27c' : '#9cc3ea'}" stroke-width="1.2"/><path d="${icons[i]}" stroke="${i === 3 ? '#d9b27c' : '#f4efe6'}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
-    nodesG.appendChild(g);
-    return g;
-  });
-  gsap.set(arch, { strokeDasharray: len, strokeDashoffset: len });
-  gsap.set(deck, { strokeDasharray: 1240, strokeDashoffset: 1240 });
-  gsap.set(hangers, { scaleY: 0, transformOrigin: '50% 100%', transformBox: 'fill-box' });
-  gsap.set(nodes, { scale: 0, transformOrigin: '50% 50%', transformBox: 'fill-box' });
-  const tl = gsap.timeline({
-    scrollTrigger: reduced ? null : { trigger: '.method__bridge', start: 'top 80%', end: 'bottom 35%', scrub: 0.8 },
-  });
-  tl.to(deck, { strokeDashoffset: 0, duration: 1, ease: 'none' })
-    .to(arch, { strokeDashoffset: 0, duration: 2, ease: 'none' }, 0.2)
-    .to(hangers, { scaleY: 1, duration: 0.4, stagger: 0.04, ease: 'power2.out' }, 0.5);
-  nodes.forEach((n, i) => {
-    tl.to(n, { scale: 1, duration: 0.4, ease: 'back.out(2)' }, 0.5 + i * 0.45)
-      .to(n.querySelector('.ng'), { opacity: 1, duration: 0.4 }, 0.6 + i * 0.45);
-  });
-  if (reduced) tl.progress(1);
-})();
-
-/* Journey line */
+/* Journey */
 const stages = document.querySelectorAll('.stage');
 ScrollTrigger.create({
   trigger: '.journey__rail', start: 'top 75%', end: 'bottom 50%', scrub: reduced ? false : 0.6,
@@ -395,25 +395,21 @@ ScrollTrigger.create({
   onLeave: () => stages.forEach((s) => s.classList.add('is-on')),
 });
 if (reduced) { gsap.set('.journey__line i', { scaleX: 1 }); stages.forEach((s) => s.classList.add('is-on')); }
-else {
-  gsap.from('.stage', { y: 50, opacity: 0, duration: 1.2, ease: 'expo.out', stagger: 0.14, scrollTrigger: { trigger: '.journey__rail', start: 'top 85%' } });
-}
+else gsap.from('.stage', { y: 50, opacity: 0, duration: 1.2, ease: 'expo.out', stagger: 0.14, scrollTrigger: { trigger: '.journey__rail', start: 'top 85%' } });
 
-/* Contact headline parallax */
 if (!reduced) {
   gsap.fromTo('.contact__big', { xPercent: 6 }, { xPercent: -2, ease: 'none', scrollTrigger: { trigger: '.contact', start: 'top bottom', end: 'bottom top', scrub: true } });
 }
 
-/* ------------------------------------------------------------------ */
-/* Nav                                                                 */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
+/* Nav, menu, cursor                                                   */
+/* ================================================================== */
 const nav = document.querySelector('.nav');
-const burger = document.querySelector('.nav__burger');
 let lastY = 0;
 const onScroll = (y) => {
   nav.classList.toggle('is-scrolled', y > 40);
-  const goingDown = y > lastY && y > 400;
-  if (!document.body.classList.contains('menu-open')) nav.classList.toggle('is-hidden', goingDown);
+  nav.classList.toggle('is-film', y < filmEl.offsetHeight - window.innerHeight * 0.5);
+  if (!document.body.classList.contains('menu-open')) nav.classList.toggle('is-hidden', y > lastY && y > 400);
   lastY = y;
 };
 if (lenis) lenis.on('scroll', ({ scroll }) => onScroll(scroll));
@@ -426,11 +422,7 @@ burger.addEventListener('click', () => {
   if (open) lenis?.stop(); else lenis?.start();
   if (open && !reduced) gsap.from('.mobile-menu a', { y: 40, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.06, delay: 0.25 });
 });
-document.querySelectorAll('.mobile-menu a').forEach((a) => a.addEventListener('click', () => lenis?.start()));
 
-/* ------------------------------------------------------------------ */
-/* Cursor + magnetic buttons                                           */
-/* ------------------------------------------------------------------ */
 if (!coarse && !reduced) {
   const cursor = document.querySelector('.cursor');
   const dot = cursor.querySelector('.cursor__dot');
@@ -439,8 +431,12 @@ if (!coarse && !reduced) {
   const yDot = gsap.quickTo(dot, 'y', { duration: 0.12, ease: 'power3' });
   const xRing = gsap.quickTo(ring, 'x', { duration: 0.5, ease: 'power3' });
   const yRing = gsap.quickTo(ring, 'y', { duration: 0.5, ease: 'power3' });
-  window.addEventListener('pointermove', (e) => { cursor.classList.add('is-active'); xDot(e.clientX); yDot(e.clientY); xRing(e.clientX); yRing(e.clientY); }, { passive: true });
-  document.querySelectorAll('a, button, [data-tilt]').forEach((el) => {
+  let seen = false;
+  window.addEventListener('pointermove', (e) => {
+    if (!seen) { seen = true; cursor.classList.add('is-active'); }
+    xDot(e.clientX); yDot(e.clientY); xRing(e.clientX); yRing(e.clientY);
+  }, { passive: true });
+  document.querySelectorAll('a, button').forEach((el) => {
     el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
   });
@@ -457,10 +453,5 @@ if (!coarse && !reduced) {
 } else {
   document.querySelector('.cursor')?.remove();
 }
-
-/* Pause WebGL when tab hidden (modules also handle visibility) */
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { hero?.pause?.(); globe?.pause?.(); } else { hero?.resume?.(); globe?.resume?.(); }
-});
 
 window.addEventListener('load', () => ScrollTrigger.refresh());

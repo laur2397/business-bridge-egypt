@@ -37,6 +37,7 @@
   </script>
   <script>document.documentElement.classList.replace('no-js','js');</script>
   <link rel="stylesheet" href="/src/styles/main.css" />
+  <link rel="stylesheet" href="/src/styles/film.css" />
 </head>
 <body class="is-loading">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -62,10 +63,12 @@
     </defs>
   </svg>
 
-  <!-- Preloader -->
+  <!-- Preloader: opening titles -->
   <div class="preloader" aria-hidden="true">
+    <div class="lb lb--top"></div><div class="lb lb--bot"></div>
     <div class="preloader__inner">
-      <img class="preloader__mark" src="/brand/mark-light.png" alt="" width="360" height="154" />
+      <svg class="preloader__arc" viewBox="0 0 400 120"><path d="M20 104 C 120 -10, 280 -10, 380 104" /></svg>
+      <p class="preloader__presents">Business Bridge Egypt <span>presents</span></p>
       <div class="preloader__bar"><span></span></div>
       <div class="preloader__count">000</div>
     </div>
@@ -100,30 +103,62 @@
   </div>
 
   <main id="main">
-    <!-- HERO -->
-    <section class="hero" id="top" aria-label="Introduction">
-      <div class="hero__sticky">
-        <div class="hero__fallback"></div>
-        <div class="hero__canvas" aria-hidden="true"></div>
-        <div class="hero__shade"></div>
+    <!-- FILM -->
+    <section class="film" id="top" aria-label="Business Bridge Egypt — introduction film">
+      <div class="film__stage">
+        <div class="film__fallback"></div>
+        <div class="film__gl"></div>
+        <div class="lb lb--top" aria-hidden="true"></div><div class="lb lb--bot" aria-hidden="true"></div>
 
-        <div class="hero__phase" aria-hidden="true"><span><i></i></span><span><i></i></span><span><i></i></span><span><i></i></span></div>
-        <div class="hero__coords" aria-hidden="true"><b>Cairo</b><br />30.0444° N<br />31.2357° E</div>
+        <div class="hud" aria-hidden="true">
+          <div class="hud__tl"><span class="hud__rec"></span><span class="hud__chapter">I · The World</span></div>
+          <div class="hud__tr"><span class="hud__tc">00:00:00:00</span></div>
+          <div class="hud__bl"><span class="hud__coord">ORBIT · 400 KM</span></div>
+          <div class="hud__br"><button class="sound" type="button" aria-pressed="false" aria-label="Turn ambient sound on"><span class="sound__bars"><i></i><i></i><i></i><i></i></span><span class="sound__label">Sound off</span></button></div>
+        </div>
 
-        <div class="hero__content">
-          <p class="eyebrow eyebrow--sand" data-hero-in>Business Bridge &nbsp;/&nbsp; Egypt</p>
-          <h1 class="display hero__title" data-split>Where global ambition meets <em>Egyptian opportunity.</em></h1>
-          <p class="lead hero__sub" data-hero-in>Independent business facilitation and strategic advisory for international businesses and investors in Egypt — from the first market question to long-term growth.</p>
-          <div class="hero__ctas" data-hero-in>
-            <a class="btn btn--solid" href="#contact" data-magnetic>Start a conversation <svg class="arrow"><use href="#i-arrow" /></svg></a>
-            <a class="btn btn--ghost" href="#services" data-magnetic>Explore services</a>
+        <div class="chapters">
+          <div class="card card--hero" data-range="0,0.12">
+            <p class="eyebrow eyebrow--sand">Business Bridge Egypt</p>
+            <h1 class="display card__title">Where global ambition meets <em>Egyptian opportunity.</em></h1>
+            <p class="lead card__sub">Independent business facilitation and strategic advisory for international businesses and investors in Egypt.</p>
+            <div class="hero__ctas">
+              <a class="btn btn--solid" href="#contact" data-magnetic>Start a conversation <svg class="arrow"><use href="#i-arrow" /></svg></a>
+              <a class="btn btn--ghost" href="#services" data-magnetic>Explore services</a>
+            </div>
+          </div>
+          <div class="card card--right" data-range="0.2,0.36">
+            <p class="eyebrow">Connected by purpose</p>
+            <h2 class="h2 card__title">Europe. The Gulf. Asia.<br />The Americas. Africa. <em>One destination.</em></h2>
+            <p class="lead card__sub">We connect international businesses and investors with practical opportunities in Egypt.</p>
+          </div>
+          <div class="card card--center card--small card--ink" data-range="0.38,0.455">
+            <p class="eyebrow eyebrow--sand">II · Descent</p>
+            <p class="card__coords">30.0444° N &nbsp;·&nbsp; 31.2357° E</p>
+          </div>
+          <div class="card card--left card--ink" data-range="0.465,0.565">
+            <p class="eyebrow eyebrow--sand">III · The River</p>
+            <h2 class="h2 card__title">Business is not built on connections alone. It is built on what they make <em>possible.</em></h2>
+          </div>
+          <div class="card card--left" data-range="0.73,0.845">
+            <p class="eyebrow">IV · The Bridge</p>
+            <h2 class="h2 card__title">From the first market question to <em>long-term growth.</em></h2>
+            <p class="lead card__sub">One partner to coordinate what your business needs in Egypt.</p>
+          </div>
+          <div class="card card--center card--finale" data-range="0.88,1.01">
+            <p class="eyebrow eyebrow--sand">V · As the lights come on in Cairo</p>
+            <p class="finale__line">Beyond words. <em>Act.</em></p>
+            <div class="hero__ctas" style="justify-content:center">
+              <a class="btn btn--solid" href="#contact" data-magnetic>Start a conversation <svg class="arrow"><use href="#i-arrow" /></svg></a>
+            </div>
           </div>
         </div>
-        <div class="hero__outro" aria-hidden="true">
-          <p class="eyebrow eyebrow--sand">As the lights come on in Cairo</p>
-          <p class="hero__outro-line">Beyond words. <em>Act.</em></p>
+
+        <div class="film__rail" aria-hidden="true">
+          <span data-at="0">I</span><span data-at="0.4">II</span><span data-at="0.5">III</span><span data-at="0.7">IV</span><span data-at="0.88">V</span>
+          <i class="film__rail-fill"></i>
         </div>
-        <div class="hero__scroll" aria-hidden="true">Scroll <i></i></div>
+        <div class="film__hint" aria-hidden="true">Scroll to begin the journey <i></i></div>
       </div>
     </section>
 
@@ -201,28 +236,6 @@
       </div>
     </section>
 
-    <!-- GLOBAL REACH -->
-    <section class="reach" id="reach" aria-label="Global reach">
-      <div class="reach__sticky">
-        <div class="reach__copy">
-          <p class="eyebrow" data-fade>Connected by purpose</p>
-          <h2 class="h2" data-split>Cairo at the centre of <em>your map.</em></h2>
-          <p class="lead" data-fade>We connect international businesses and investors from Europe, the Gulf, Asia, the Americas and Africa with practical opportunities in Egypt.</p>
-          <ul class="regions" aria-label="Regions">
-            <li><button data-region="europe"><span>Europe</span><span>London · Frankfurt</span></button></li>
-            <li><button data-region="gulf"><span>The Gulf</span><span>Dubai · Riyadh</span></button></li>
-            <li><button data-region="asia"><span>Asia</span><span>Singapore · Shanghai</span></button></li>
-            <li><button data-region="americas"><span>The Americas</span><span>New York</span></button></li>
-            <li><button data-region="africa"><span>Africa</span><span>Lagos · Nairobi · Joburg</span></button></li>
-          </ul>
-        </div>
-        <div class="reach__globe">
-          <div class="reach__globe-fallback"></div>
-          <div class="reach__globe-canvas" aria-hidden="true"></div>
-        </div>
-      </div>
-    </section>
-
     <!-- WHO WE WORK WITH -->
     <section class="clients section" id="clients">
       <div class="wrap">
@@ -244,7 +257,7 @@
       </div>
     </section>
 
-    <!-- SERVICES -->
+    <!-- SERVICES: the hall of monoliths -->
     <section class="services" id="services">
       <div class="wrap services__intro">
         <div>
@@ -253,104 +266,84 @@
         </div>
         <p class="lead" data-fade>From the first market question to long-term growth, we coordinate what your business needs in Egypt.</p>
       </div>
-      <div class="services__pin">
-        <div class="services__track">
-          <div class="svc svc--intro"><p>Scroll to move across the bridge — each service is one span of your path into Egypt.</p></div>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">01</span><svg class="svc__icon"><use href="#i-research" /></svg></div>
+      <div class="hall">
+        <div class="hall__stage">
+          <div class="hall__fallback"></div>
+          <div class="hall__gl" aria-hidden="true"></div>
+          <div class="hall__shade" aria-hidden="true"></div>
+          <div class="hall__panel">
+          <article class="hall__item is-active" data-i="0">
+            <span class="hall__num">01 <i>/ 08</i></span>
             <h3>Market Research &amp; Feasibility Studies</h3>
             <p>Before any commitment, you need a clear picture of the market. Market intelligence tailored to your sector, and feasibility work that weighs risks and returns.</p>
             <ul><li>Sector and market intelligence</li><li>Competitor and customer insights</li><li>Overview of the regulatory landscape</li><li>Feasibility study coordination</li><li>Site selection and comparative analysis</li></ul>
           </article>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">02</span><svg class="svc__icon"><use href="#i-building" /></svg></div>
+          <article class="hall__item" data-i="1">
+            <span class="hall__num">02 <i>/ 08</i></span>
             <h3>Business Establishment &amp; Corporate Services</h3>
             <p>Setting up involves many steps and many offices. We coordinate the full process so your company is registered, licensed and ready to operate.</p>
             <ul><li>Company formation and registration</li><li>Licensing and permits coordination</li><li>Tax and trade registration support</li><li>Administrative coordination</li><li>Operational setup: office, utilities, telecom</li></ul>
           </article>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">03</span><svg class="svc__icon"><use href="#i-partners" /></svg></div>
+          <article class="hall__item" data-i="2">
+            <span class="hall__num">03 <i>/ 08</i></span>
             <h3>Strategic Partnerships &amp; Business Development</h3>
             <p>The right partner is the difference between a slow start and real momentum. We identify and introduce reliable partners aligned with your objectives.</p>
             <ul><li>Partner, distributor and supplier matchmaking</li><li>Introductions to potential clients</li><li>B2B meetings and business missions</li><li>Support for trade fairs and events</li><li>Follow-up until cooperation is in place</li></ul>
           </article>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">04</span><svg class="svc__icon"><use href="#i-gov" /></svg></div>
+          <article class="hall__item" data-i="3">
+            <span class="hall__num">04 <i>/ 08</i></span>
             <h3>Government Liaison &amp; Investment Facilitation</h3>
             <p>Clear, consistent communication with public institutions. We help you prepare, submit and follow up — and understand the incentives that may apply.</p>
             <ul><li>Coordination with relevant authorities</li><li>Investment procedure support and follow-up</li><li>Guidance on incentives and tax benefits</li><li>Information on economic and free zones</li><li>Investor visa and residency facilitation</li></ul>
           </article>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">05</span><svg class="svc__icon"><use href="#i-industry" /></svg></div>
+          <article class="hall__item" data-i="4">
+            <span class="hall__num">05 <i>/ 08</i></span>
             <h3>Real Estate &amp; Industrial Opportunities</h3>
             <p>Location shapes cost, logistics and growth. We find commercial, industrial and logistics sites that match your operational needs and expansion plans.</p>
             <ul><li>Office and commercial space</li><li>Industrial facilities and warehouses</li><li>Land and industrial park options</li><li>Site visits and comparison</li><li>Lease and purchase negotiation support</li></ul>
           </article>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">06</span><svg class="svc__icon"><use href="#i-bank" /></svg></div>
+          <article class="hall__item" data-i="5">
+            <span class="hall__num">06 <i>/ 08</i></span>
             <h3>Banking &amp; Financial Relations</h3>
             <p>A smooth financial setup is essential from day one. Introductions to banks and financial institutions, and coordination of the steps that follow.</p>
             <ul><li>Banking introductions</li><li>Account opening coordination</li><li>Relationships with financial institutions</li><li>Coordination with financial service providers</li><li>Ongoing administrative support</li></ul>
           </article>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">07</span><svg class="svc__icon"><use href="#i-legal" /></svg></div>
+          <article class="hall__item" data-i="6">
+            <span class="hall__num">07 <i>/ 08</i></span>
             <h3>Legal &amp; Regulatory Coordination</h3>
             <p>Every investment must stand on solid legal ground. We connect you with qualified legal professionals and coordinate corporate and regulatory matters.</p>
             <ul><li>Access to qualified law firms</li><li>Coordination of corporate matters</li><li>Contract and compliance coordination</li><li>Labour and employment matters</li><li>Regulatory follow-up</li></ul>
             <p class="svc__note">Legal advice is provided by licensed legal professionals.</p>
           </article>
-
-          <article class="svc" data-tilt><div class="svc__glow"></div>
-            <div class="svc__top"><span class="svc__num">08</span><svg class="svc__icon"><use href="#i-compass" /></svg></div>
+          <article class="hall__item" data-i="7">
+            <span class="hall__num">08 <i>/ 08</i></span>
             <h3>Ongoing Business Advisory</h3>
             <p>Our role does not end once you are established. We remain a practical partner as your business grows and expands in Egypt and the region.</p>
             <ul><li>Business development support</li><li>Operational coordination</li><li>Expansion planning</li><li>Recruitment and workforce coordination</li><li>Networking with industry peers</li></ul>
           </article>
+          </div>
+          <ol class="hall__index" aria-label="Services">
+            <li><button type="button" data-goto="0"><span>01</span></button></li><li><button type="button" data-goto="1"><span>02</span></button></li><li><button type="button" data-goto="2"><span>03</span></button></li><li><button type="button" data-goto="3"><span>04</span></button></li><li><button type="button" data-goto="4"><span>05</span></button></li><li><button type="button" data-goto="5"><span>06</span></button></li><li><button type="button" data-goto="6"><span>07</span></button></li><li><button type="button" data-goto="7"><span>08</span></button></li>
+          </ol>
+          <div class="hall__progress" aria-hidden="true"><i></i></div>
         </div>
-        <div class="services__count" aria-hidden="true"><span class="cur">01</span> / 08</div>
-        <div class="services__progress" aria-hidden="true"><i></i></div>
       </div>
     </section>
 
-    <!-- METHOD -->
-    <section class="method section" id="method">
-      <div class="wrap">
+    <!-- METHOD: the bridge builds itself -->
+    <section class="method" id="method">
+      <div class="method__stage">
+        <div class="method__fallback"></div>
+        <div class="method__gl" aria-hidden="true"></div>
         <div class="method__head">
-          <p class="eyebrow" data-fade>How we work</p>
-          <h2 class="h2" data-split>Understand. Connect. Coordinate. <em>Act.</em></h2>
-        </div>
-        <div class="method__bridge" aria-hidden="true">
-          <svg viewBox="0 0 1280 430" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="arcGrad" x1="0" x2="1"><stop offset="0" stop-color="#5b8dc4"/><stop offset="1" stop-color="#d9b27c"/></linearGradient>
-              <radialGradient id="nodeGlow"><stop offset="0" stop-color="#d9b27c" stop-opacity=".55"/><stop offset="1" stop-color="#d9b27c" stop-opacity="0"/></radialGradient>
-            </defs>
-            <!-- water reflection lines -->
-            <g class="m-water" stroke="rgba(156,195,234,.14)" stroke-width="1">
-              <line x1="0" y1="352" x2="1280" y2="352"/><line x1="80" y1="370" x2="1200" y2="370"/><line x1="200" y1="388" x2="1080" y2="388"/><line x1="340" y1="404" x2="940" y2="404"/>
-            </g>
-            <!-- deck -->
-            <path class="m-deck" d="M20 330 L1260 330" stroke="#f4efe6" stroke-opacity=".5" stroke-width="2" fill="none"/>
-            <!-- arch -->
-            <path class="m-arch" d="M60 330 C 330 60, 950 60, 1220 330" stroke="url(#arcGrad)" stroke-width="2.5" fill="none"/>
-            <!-- hangers -->
-            <g class="m-hangers" stroke="rgba(244,239,230,.35)" stroke-width="1"></g>
-            <!-- nodes -->
-            <g class="m-nodes"></g>
-          </svg>
+          <p class="eyebrow">How we work</p>
+          <h2 class="h2">Understand. Connect. Coordinate. <em>Act.</em></h2>
         </div>
         <div class="method__steps">
-          <div class="mstep" data-fade><span class="mstep__n">01</span><h3>Understand</h3><p>Define objectives and priorities.</p></div>
-          <div class="mstep" data-fade><span class="mstep__n">02</span><h3>Connect</h3><p>Identify people and capabilities.</p></div>
-          <div class="mstep" data-fade><span class="mstep__n">03</span><h3>Coordinate</h3><p>Align processes and participants.</p></div>
-          <div class="mstep mstep--act" data-fade><span class="mstep__n">04</span><h3>Act</h3><p>Support practical next steps.</p></div>
+          <div class="mstep" data-step="0"><span class="mstep__n">01</span><h3>Understand</h3><p>Define objectives and priorities.</p></div>
+          <div class="mstep" data-step="1"><span class="mstep__n">02</span><h3>Connect</h3><p>Identify people and capabilities.</p></div>
+          <div class="mstep" data-step="2"><span class="mstep__n">03</span><h3>Coordinate</h3><p>Align processes and participants.</p></div>
+          <div class="mstep mstep--act" data-step="3"><span class="mstep__n">04</span><h3>Act</h3><p>Support practical next steps.</p></div>
         </div>
       </div>
     </section>

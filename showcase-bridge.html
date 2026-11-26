@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:," />
+  <title>Showcase — Constructia podului</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #050B1A; color: #F4EFE6; font: 13px/1.4 system-ui, sans-serif; overflow: hidden; }
+    #stage { position: fixed; inset: 0; }
+    #ui { position: fixed; left: 16px; bottom: 16px; z-index: 2; display: flex; gap: 10px; align-items: center;
+      background: rgba(5, 11, 26, .6); padding: 10px 12px; border: 1px solid rgba(156, 195, 234, .2); border-radius: 10px; }
+    body.noui #ui { display: none; }
+    input[type=range] { width: 320px; }
+    .lbl { position: fixed; z-index: 1; transform: translate(14px, -50%); font: 500 11px/1.2 system-ui, sans-serif; letter-spacing: .18em;
+      text-transform: uppercase; color: #9CC3EA; opacity: 0; transition: opacity .4s; pointer-events: none; white-space: nowrap; }
+    .lbl.on { opacity: .9; }
+    .lbl.gold { color: #D9B27C; }
+    body.nolabels .lbl { display: none; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="ui">
+    <label>progress <input id="p" type="range" min="0" max="1" step="0.001" value="0" /></label>
+    <output id="pv">0.000</output>
+  </div>
+  <script type="module">
+    import { createBridgeBuild } from './src/showcase/bridgebuild.js';
+    const qs = new URLSearchParams(location.search);
+    if (qs.has('noui')) document.body.classList.add('noui');
+    const p0 = qs.has('p') ? +qs.get('p') : 0;
+    const api = createBridgeBuild(document.getElementById('stage'), { quality: qs.get('q') === 'low' ? 'low' : 'high' });
+    window.__api = api;
+    const slider = document.getElementById('p'), out = document.getElementById('pv');
+    const set = (v) => { api.setProgress(v); slider.value = v; out.textContent = (+v).toFixed(3); };
+    set(p0);
+    slider.addEventListener('input', () => set(+slider.value));
+    addEventListener('pointermove', (e) => api.setPointer(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight * 2 - 1)));
+    if (qs.has('nolabels')) document.body.classList.add('nolabels');
+    const names = ['Understand', 'Connect', 'Coordinate', 'Act'];
+    const lbls = names.map((n, i) => { const d = document.createElement('div'); d.className = 'lbl' + (i === 3 ? ' gold' : ''); d.textContent = n; document.body.appendChild(d); return d; });
+    const place = () => {
+      requestAnimationFrame(place);
+      api.getNodeScreenPositions().forEach((p, i) => {
+        lbls[i].style.left = (p.x * innerWidth) + 'px'; lbls[i].style.top = (p.y * innerHeight) + 'px';
+        lbls[i].classList.toggle('on', p.lit > 0.5 && p.visible);
+      });
+    };
+    place();
+    window.__ready = false;
+    api.ready.then(() => { window.__ready = true; }, (e) => { console.error(e); window.__readyError = String(e); });
+  </script>
+</body>
+</html>
