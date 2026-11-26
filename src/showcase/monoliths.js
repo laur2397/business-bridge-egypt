@@ -8,6 +8,8 @@ import {
   damp, clamp01, GLSL_NOISE,
 } from './common.js';
 import numeralFontUrl from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+// Small HDRI inlined as a data URL so it ships with the module (no separate .exr request)
+import studioExr from '../assets/hdri/studio.exr?inline';
 
 const COUNT = 8;
 const SPACING = 4.6;
@@ -593,7 +595,7 @@ export function createMonoliths(container, { quality = 'high' } = {}) {
 
   const assets = createAssets(renderer);
   const ready = (async () => {
-    const [studio] = await Promise.all([assets.exr(`${BASE}hdri/studio.exr`), loadFont()]);
+    const [studio] = await Promise.all([assets.exr(studioExr), loadFont()]);
     if (disposed) return;
     envRT = buildEnv(renderer, studio);
     scene.environment = envRT.texture;

@@ -2,6 +2,8 @@
 // createBridgeBuild(container, { quality }) -> { setProgress, setPointer, pause, resume, dispose, ready, getNodeScreenPositions }
 import * as THREE from 'three';
 import { createAssets } from '../film/assets.js';
+// Small HDRI inlined as a data URL so it ships with the module (no separate .exr request)
+import nightExr from '../assets/hdri/night.exr?inline';
 import {
   BASE, createStage, createLoop, createPlanarReflection, prefersReducedMotion, damp, clamp01, GLSL_NOISE,
 } from './common.js';
@@ -747,7 +749,7 @@ export function createBridgeBuild(container, { quality = 'high' } = {}) {
   let disposed = false;
   const assets = createAssets(renderer);
   const ready = (async () => {
-    const env = await assets.envMap(`${BASE}hdri/night.exr`);
+    const env = await assets.envMap(nightExr);
     if (disposed) return;
     scene.environment = env;
     scene.environmentIntensity = 0.6;
