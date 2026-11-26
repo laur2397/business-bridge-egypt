@@ -49,7 +49,17 @@ export function createAmbience() {
     const trem = ac.createOscillator(); trem.frequency.value = 0.35;
     const tremG = ac.createGain(); tremG.gain.value = 0.015; trem.connect(tremG); tremG.connect(water.gain); trem.start();
 
-    nodes = { pad, padFilter, wind, water, oscs, verbIn };
+    // Hold swell: sub + rising filtered noise + a fifth above, all driven by hold amount
+    const swell = ac.createGain(); swell.gain.value = 0;
+    const swellF = ac.createBiquadFilter(); swellF.type = 'lowpass'; swellF.frequency.value = 180; swellF.Q.value = 4;
+    noise.connect(swellF); swellF.connect(swell);
+    const sub = ac.createOscillator(); sub.type = 'sine'; sub.frequency.value = 41.2;
+    const fifth = ac.createOscillator(); fifth.type = 'triangle'; fifth.frequency.value = 61.7;
+    const subG = ac.createGain(); subG.gain.value = 0.5; sub.connect(subG); fifth.connect(subG); subG.connect(swell);
+    sub.start(); fifth.start();
+    swell.connect(comp); swell.connect(verbIn);
+
+    nodes = { pad, padFilter, wind, water, oscs, verbIn, swell, swellF, fifth };
   }
 
   function bell(freq = 660) {
@@ -90,6 +100,41 @@ export function createAmbience() {
       nodes.water.gain.setTargetAtTime(0.06 * river, t, 1.0);
     },
     chime(i) { bell([523.25, 587.33, 659.25, 783.99, 880][i % 5]); },
+    /** Hold to Act: a 0..1 swell (sub, rising filter, slight pitch bend) */
+    hold(a) {
+      if (!on || !ac || !nodes) return;
+      const t = ac.currentTime;
+      const k = Math.max(0, Math.min(1, a));
+      nodes.swell.gain.setTargetAtTime(0.42 * k * k, t, k > 0.01 ? 0.25 : 0.6);
+      nodes.swellF.frequency.setTargetAtTime(180 + 2400 * k * k, t, 0.3);
+      nodes.fifth.frequency.setTargetAtTime(61.7 * (1 + 0.06 * k), t, 0.4);
+      nodes.padFilter.Q.setTargetAtTime(0.6 + 5 * k, t, 0.3);
+    },
+    /** Particle burst: a filtered noise crack + a falling glass tone */
+    burst() {
+      if (!on || !ac) return;
+      const t = ac.currentTime;
+      const src = ac.createBufferSource(); src.buffer = whiteNoise(ac, 0.6);
+      const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.4;
+      bp.frequency.setValueAtTime(5200, t); bp.frequency.exponentialRampToValueAtTime(260, t + 0.55);
+      const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+      src.connect(bp); bp.connect(g); g.connect(master); g.connect(nodes.verbIn); src.start(t); src.stop(t + 0.62);
+      const o = ac.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(1760, t); o.frequency.exponentialRampToValueAtTime(440, t + 0.9);
+      const og = ac.createGain(); og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(0.06, t + 0.02); og.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+      o.connect(og); og.connect(nodes.verbIn); og.connect(master); o.start(t); o.stop(t + 1.5);
+    },
+    /** Short air whoosh for chapter jumps and service changes */
+    whoosh(strength = 1) {
+      if (!on || !ac) return;
+      const t = ac.currentTime;
+      const src = ac.createBufferSource(); src.buffer = whiteNoise(ac, 1.2);
+      const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.9;
+      bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(2600, t + 0.5); bp.frequency.exponentialRampToValueAtTime(500, t + 1.1);
+      const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12 * strength, t + 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.15);
+      src.connect(bp); bp.connect(g); g.connect(master); g.connect(nodes.verbIn); src.start(t); src.stop(t + 1.2);
+    },
+    async ensureOn() { if (!on) await this.toggle(); return on; },
   };
 }
 
@@ -104,6 +149,14 @@ function pinkNoise(ac, seconds) {
     b3 = 0.8665 * b3 + w * 0.3104856; b4 = 0.55 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.016898;
     d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926;
   }
+  return buf;
+}
+
+function whiteNoise(ac, seconds) {
+  const len = Math.floor(ac.sampleRate * seconds);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
   return buf;
 }
 

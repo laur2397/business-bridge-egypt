@@ -7,7 +7,7 @@ import {
   BASE, createStage, createLoop, createPlanarReflection, createBackdrop, prefersReducedMotion,
   damp, clamp01, GLSL_NOISE,
 } from './common.js';
-import numeralFontUrl from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-300-normal.woff2?url';
+import numeralFontUrl from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
 
 const COUNT = 8;
 const SPACING = 4.6;
@@ -26,7 +26,7 @@ function rowPos(s, out = new THREE.Vector3()) {
   return out.copy(ROW_T).multiplyScalar(s * SPACING);
 }
 
-// Cormorant Garamond defaults to old-style figures ("01" reads "OI"); load a private face with lining figures.
+// Numerals: Archivo (variable width axis), set condensed and light to match the v3 type system.
 const NUMERAL_FAMILY = 'BBE Numerals';
 let fontPromise = null;
 function loadFont() {
@@ -34,7 +34,7 @@ function loadFont() {
   fontPromise = (async () => {
     if (typeof FontFace === 'undefined' || !document.fonts) return;
     try {
-      const ff = new FontFace(NUMERAL_FAMILY, `url(${numeralFontUrl})`, { weight: '300', featureSettings: '"lnum" 1, "pnum" 1' });
+      const ff = new FontFace(NUMERAL_FAMILY, `url(${numeralFontUrl})`, { weight: '100 900', stretch: '62% 125%' });
       await Promise.race([ff.load(), new Promise((_, rej) => setTimeout(() => rej(new Error('font timeout')), 4000))]);
       document.fonts.add(ff);
     } catch { /* falls back to a system serif */ }
@@ -51,7 +51,8 @@ function numeralTexture(n, renderer, bold) {
   g.fillStyle = '#fff';
   g.textAlign = 'center';
   g.textBaseline = 'alphabetic';
-  g.font = `300 330px "${NUMERAL_FAMILY}", "Cormorant Garamond", Georgia, serif`;
+  g.font = `200 380px "${NUMERAL_FAMILY}", "Archivo Variable", system-ui, sans-serif`;
+  if ('fontStretch' in g) g.fontStretch = 'extra-condensed';
   const label = String(n).padStart(2, '0');
   g.fillText(label, W / 2, 470);
   g.strokeStyle = '#fff';

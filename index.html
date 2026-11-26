@@ -45,15 +45,9 @@
   <!-- SVG icon sprite -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
-      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-      <symbol id="i-research" viewBox="0 0 48 48"><circle cx="21" cy="21" r="13"/><path d="M30.5 30.5 42 42M15 25v-4M21 25v-8M27 25v-6"/></symbol>
-      <symbol id="i-building" viewBox="0 0 48 48"><path d="M10 42V8h20v34M30 18h8v24M6 42h36M16 15h2M22 15h2M16 22h2M22 22h2M16 29h2M22 29h2M18 42v-6h4v6"/></symbol>
-      <symbol id="i-partners" viewBox="0 0 48 48"><circle cx="18" cy="24" r="11"/><circle cx="30" cy="24" r="11"/><path d="M24 8v32"/></symbol>
-      <symbol id="i-gov" viewBox="0 0 48 48"><path d="M6 18 24 7l18 11M8 18h32M11 22v14M19 22v14M29 22v14M37 22v14M6 40h36M8 36h32"/></symbol>
-      <symbol id="i-industry" viewBox="0 0 48 48"><path d="M6 40V22l10 7v-7l10 7v-7l10 7V8h6v32zM6 40h36M14 34h4M22 34h4M30 34h4"/></symbol>
-      <symbol id="i-bank" viewBox="0 0 48 48"><rect x="6" y="13" width="36" height="22" rx="3"/><circle cx="24" cy="24" r="5"/><path d="M12 19h2M34 29h2"/></symbol>
-      <symbol id="i-legal" viewBox="0 0 48 48"><path d="M24 7v34M14 41h20M10 13h28M10 13l-5 12a5 5 0 0 0 10 0zM38 13l-5 12a5 5 0 0 0 10 0zM24 9a2 2 0 1 0 0-.01"/></symbol>
-      <symbol id="i-compass" viewBox="0 0 48 48"><circle cx="24" cy="24" r="17"/><path d="m30 18-3.5 8.5L18 30l3.5-8.5z"/><path d="M24 4v4M24 40v4M4 24h4M40 24h4"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M3 12h17M14 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24"><path d="M6 6h12v12H6z" fill="currentColor"/></symbol>
       <symbol id="i-globe" viewBox="0 0 48 48"><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c5 5 7 11 7 17s-2 12-7 17c-5-5-7-11-7-17s2-12 7-17z"/></symbol>
       <symbol id="i-chart" viewBox="0 0 48 48"><path d="M6 40h36M10 34l9-10 7 6 12-14M30 16h8v8"/></symbol>
       <symbol id="i-factory" viewBox="0 0 48 48"><path d="M6 40V20l9 6v-6l9 6v-6l9 6V10h7v30zM6 40h36"/></symbol>
@@ -66,338 +60,384 @@
   <!-- Preloader: opening titles -->
   <div class="preloader" aria-hidden="true">
     <div class="lb lb--top"></div><div class="lb lb--bot"></div>
+    <div class="preloader__meta preloader__meta--tl mono">BBE / Title sequence</div>
+    <div class="preloader__meta preloader__meta--tr mono">30.0444° N · 31.2357° E</div>
     <div class="preloader__inner">
       <svg class="preloader__arc" viewBox="0 0 400 120"><path d="M20 104 C 120 -10, 280 -10, 380 104" /></svg>
-      <p class="preloader__presents">Business Bridge Egypt <span>presents</span></p>
-      <div class="preloader__bar"><span></span></div>
-      <div class="preloader__count">000</div>
+      <p class="preloader__name t-disp" data-chars>Business Bridge Egypt</p>
+      <p class="preloader__presents">presents</p>
     </div>
-    <div class="preloader__curtain"></div>
+    <div class="preloader__load">
+      <span class="mono">Loading the film</span>
+      <div class="preloader__bar"><span></span></div>
+    </div>
+    <div class="preloader__count t-num">000</div>
   </div>
 
   <div class="grain" aria-hidden="true"></div>
-  <div class="cursor" aria-hidden="true"><div class="cursor__ring"></div><div class="cursor__dot"></div></div>
+  <div class="cursor" aria-hidden="true">
+    <div class="cursor__ring"></div><div class="cursor__dot"></div><span class="cursor__label mono"></span>
+  </div>
+  <div class="holdring" aria-hidden="true">
+    <svg viewBox="0 0 100 100"><circle class="holdring__track" cx="50" cy="50" r="44" /><circle class="holdring__bar" cx="50" cy="50" r="44" pathLength="1" /></svg>
+    <span class="holdring__label mono">Hold</span>
+  </div>
 
   <!-- Navigation -->
   <header class="nav" role="banner">
     <a class="nav__logo" href="#top" aria-label="Business Bridge Egypt — home">
       <img src="/brand/mark-light.png" alt="" width="360" height="154" />
-      <span class="nav__word">Business Bridge<small>Egypt</small></span>
+      <span class="nav__word">Business Bridge<small class="mono">Egypt</small></span>
     </a>
+    <div class="nav__now mono" aria-hidden="true"><span class="nav__now-n">00</span><span class="nav__now-t">The film</span></div>
     <nav class="nav__links" aria-label="Primary">
-      <a href="#about">About</a>
-      <a href="#egypt">Why Egypt</a>
-      <a href="#services">Services</a>
-      <a href="#method">How we work</a>
-      <a class="btn btn--ghost" href="#contact" data-magnetic>Start a conversation</a>
+      <a href="#about"><i class="mono">01</i>About</a>
+      <a href="#egypt"><i class="mono">02</i>Why Egypt</a>
+      <a href="#services"><i class="mono">04</i>Services</a>
+      <a href="#method"><i class="mono">05</i>How we work</a>
+      <a class="btn btn--line" href="#contact" data-magnetic><span>Start a conversation</span></a>
     </nav>
     <button class="nav__burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
   </header>
   <div class="mobile-menu" id="mobile-menu">
-    <a href="#about">About</a>
-    <a href="#egypt">Why Egypt</a>
-    <a href="#services">Services</a>
-    <a href="#method">How we work</a>
-    <a href="#contact">Contact</a>
-    <div class="mm-contact">+20 12 02011120<br />galal@binvestb.com</div>
+    <div class="mm-links">
+      <a href="#about"><i class="mono">01</i>About</a>
+      <a href="#egypt"><i class="mono">02</i>Why Egypt</a>
+      <a href="#services"><i class="mono">04</i>Services</a>
+      <a href="#method"><i class="mono">05</i>How we work</a>
+      <a href="#contact"><i class="mono">08</i>Contact</a>
+    </div>
+    <div class="mm-contact mono">+20 12 02011120<br />galal@binvestb.com<br />New Cairo · Egypt</div>
   </div>
 
   <main id="main">
     <!-- FILM -->
     <section class="film" id="top" aria-label="Business Bridge Egypt — introduction film">
-      <div class="film__stage">
+      <div class="film__stage" data-cursor="Hold">
         <div class="film__fallback"></div>
         <div class="film__gl"></div>
         <div class="lb lb--top" aria-hidden="true"></div><div class="lb lb--bot" aria-hidden="true"></div>
 
-        <div class="hud" aria-hidden="true">
-          <div class="hud__tl"><span class="hud__rec"></span><span class="hud__chapter">I · The World</span></div>
-          <div class="hud__tr"><span class="hud__tc">00:00:00:00</span></div>
-          <div class="hud__bl"><span class="hud__coord">ORBIT · 400 KM</span></div>
-          <div class="hud__br"><button class="sound" type="button" aria-pressed="false" aria-label="Turn ambient sound on"><span class="sound__bars"><i></i><i></i><i></i><i></i></span><span class="sound__label">Sound off</span></button></div>
+        <div class="hud">
+          <div class="hud__tl mono" aria-hidden="true"><span class="hud__rec"></span><span class="hud__chapter">I · The World</span></div>
+          <div class="hud__tr mono" aria-hidden="true"><span class="hud__tc">00:00:00:00</span></div>
+          <div class="hud__bl mono" aria-hidden="true"><span class="hud__coord">Orbit · 400 km</span></div>
+          <div class="hud__br">
+            <button class="play" type="button" aria-pressed="false" data-cursor="Play">
+              <span class="play__icon"><svg><use href="#i-play" /></svg></span>
+              <span class="play__label"><b>Play the film</b><small class="mono">Director mode · 01:10</small></span>
+            </button>
+            <button class="sound mono" type="button" aria-pressed="false" aria-label="Turn ambient sound on"><span class="sound__bars"><i></i><i></i><i></i><i></i></span><span class="sound__label">Sound off</span></button>
+          </div>
         </div>
 
         <div class="chapters">
           <div class="card card--hero" data-range="0,0.12">
-            <p class="eyebrow eyebrow--sand">Business Bridge Egypt</p>
-            <h1 class="display card__title">Where global ambition meets <em>Egyptian opportunity.</em></h1>
-            <p class="lead card__sub">Independent business facilitation and strategic advisory for international businesses and investors in Egypt.</p>
-            <div class="hero__ctas">
-              <a class="btn btn--solid" href="#contact" data-magnetic>Start a conversation <svg class="arrow"><use href="#i-arrow" /></svg></a>
-              <a class="btn btn--ghost" href="#services" data-magnetic>Explore services</a>
+            <p class="card__kick mono"><b>00</b> Business Bridge Egypt <span>presents</span></p>
+            <h1 class="t-disp t-d1 card__title" data-vel>Where global ambition meets Egyptian <em>opportunity.</em></h1>
+            <div class="card__foot">
+              <p class="lead card__sub">Independent business facilitation and strategic advisory for international businesses and investors in Egypt.</p>
+              <div class="ctas">
+                <a class="btn btn--solid" href="#contact" data-magnetic><span>Start a conversation</span><svg class="arrow"><use href="#i-arrow" /></svg></a>
+                <a class="btn btn--line" href="#services" data-magnetic><span>Explore services</span></a>
+              </div>
             </div>
           </div>
           <div class="card card--right" data-range="0.2,0.36">
-            <p class="eyebrow">Connected by purpose</p>
-            <h2 class="h2 card__title">Europe. The Gulf. Asia.<br />The Americas. Africa. <em>One destination.</em></h2>
+            <span class="card__no" aria-hidden="true">I</span>
+            <p class="card__kick mono"><b>I</b> The World · Connected by purpose</p>
+            <h2 class="t-disp t-h2 card__title" data-vel>Europe. The Gulf. Asia.<br />The Americas. Africa. One <em>destination.</em></h2>
             <p class="lead card__sub">We connect international businesses and investors with practical opportunities in Egypt.</p>
           </div>
           <div class="card card--center card--small card--ink" data-range="0.38,0.455">
-            <p class="eyebrow eyebrow--sand">II · Descent</p>
-            <p class="card__coords">30.0444° N &nbsp;·&nbsp; 31.2357° E</p>
+            <span class="card__no" aria-hidden="true">II</span>
+            <p class="card__kick mono"><b>II</b> Descent · Nile Delta</p>
+            <p class="card__coords t-disp">30.0444° N · 31.2357° E</p>
           </div>
           <div class="card card--left card--ink" data-range="0.465,0.565">
-            <p class="eyebrow eyebrow--sand">III · The River</p>
-            <h2 class="h2 card__title">Business is not built on connections alone. It is built on what they make <em>possible.</em></h2>
+            <span class="card__no" aria-hidden="true">III</span>
+            <p class="card__kick mono"><b>III</b> The River</p>
+            <h2 class="t-disp t-h2 t-h2--long card__title" data-vel>Business is not built on connections alone. It is built on what they make <em>possible.</em></h2>
           </div>
           <div class="card card--left" data-range="0.73,0.845">
-            <p class="eyebrow">IV · The Bridge</p>
-            <h2 class="h2 card__title">From the first market question to <em>long-term growth.</em></h2>
+            <span class="card__no" aria-hidden="true">IV</span>
+            <p class="card__kick mono"><b>IV</b> The Bridge</p>
+            <h2 class="t-disp t-h2 card__title" data-vel>From the first market question to long-term <em>growth.</em></h2>
             <p class="lead card__sub">One partner to coordinate what your business needs in Egypt.</p>
           </div>
           <div class="card card--center card--finale" data-range="0.88,1.01">
-            <p class="eyebrow eyebrow--sand">V · As the lights come on in Cairo</p>
-            <p class="finale__line">Beyond words. <em>Act.</em></p>
-            <div class="hero__ctas" style="justify-content:center">
-              <a class="btn btn--solid" href="#contact" data-magnetic>Start a conversation <svg class="arrow"><use href="#i-arrow" /></svg></a>
+            <span class="card__no" aria-hidden="true">V</span>
+            <p class="card__kick mono"><b>V</b> As the lights come on in Cairo</p>
+            <p class="finale__line t-disp" data-vel>Beyond words. <em>Act.</em></p>
+            <div class="ctas ctas--center">
+              <a class="btn btn--solid" href="#contact" data-magnetic><span>Start a conversation</span><svg class="arrow"><use href="#i-arrow" /></svg></a>
             </div>
           </div>
         </div>
 
-        <div class="film__rail" aria-hidden="true">
-          <span data-at="0">I</span><span data-at="0.4">II</span><span data-at="0.5">III</span><span data-at="0.7">IV</span><span data-at="0.88">V</span>
-          <i class="film__rail-fill"></i>
-        </div>
-        <div class="film__hint" aria-hidden="true">Scroll to begin the journey <i></i></div>
+        <nav class="rail" aria-label="Film chapters">
+          <button type="button" data-at="0" data-cursor="View" aria-label="Chapter I, The World"><b>I</b><span class="rail__tip"><em>The World</em><i class="mono">00:00:00:00</i></span></button>
+          <button type="button" data-at="0.385" data-cursor="View" aria-label="Chapter II, Descent"><b>II</b><span class="rail__tip"><em>Descent</em><i class="mono"></i></span></button>
+          <button type="button" data-at="0.5" data-cursor="View" aria-label="Chapter III, The River"><b>III</b><span class="rail__tip"><em>The River</em><i class="mono"></i></span></button>
+          <button type="button" data-at="0.76" data-cursor="View" aria-label="Chapter IV, The Bridge"><b>IV</b><span class="rail__tip"><em>The Bridge</em><i class="mono"></i></span></button>
+          <button type="button" data-at="0.92" data-cursor="View" aria-label="Chapter V, Act"><b>V</b><span class="rail__tip"><em>Act</em><i class="mono"></i></span></button>
+          <span class="rail__line" aria-hidden="true"><i></i></span>
+        </nav>
+        <div class="film__hint mono" aria-hidden="true"><span>Scroll — or hold to act</span><i></i></div>
       </div>
     </section>
 
     <!-- MARQUEE -->
     <div class="marquee" aria-hidden="true">
       <div class="marquee__track">
-        <span>Market entry</span><span>Company formation</span><span>Strategic partnerships</span><span>Investment facilitation</span><span>Industrial sites</span><span>Banking relations</span><span>Legal coordination</span><span>Ongoing advisory</span>
-        <span>Market entry</span><span>Company formation</span><span>Strategic partnerships</span><span>Investment facilitation</span><span>Industrial sites</span><span>Banking relations</span><span>Legal coordination</span><span>Ongoing advisory</span>
+        <span>Market entry</span><em>Company formation</em><span>Strategic partnerships</span><em>Investment facilitation</em><span>Industrial sites</span><em>Banking relations</em><span>Legal coordination</span><em>Ongoing advisory</em>
       </div>
     </div>
 
-    <!-- MANIFESTO / ABOUT -->
-    <section class="manifesto section" id="about">
-      <div class="wrap">
-        <div class="manifesto__grid">
-          <div><p class="eyebrow" data-fade>Who we are</p></div>
-          <div>
-            <p class="manifesto__text" data-words>Business is not built on connections alone. It is built on what those connections make <span class="hl">possible.</span> We move beyond introductions and discussions toward meaningful <span class="hl">cooperation and action.</span></p>
-            <div class="manifesto__foot">
-              <div data-fade><h4>Independent by nature</h4><p>An independent facilitation and strategic advisory company — our only agenda is your progress in Egypt.</p></div>
-              <div data-fade><h4>Connected by purpose</h4><p>Local market knowledge, professional expertise and business relationships, brought together around your objectives.</p></div>
-              <div data-fade><h4>One point of contact</h4><p>We coordinate what your business needs in Egypt, so you speak to one partner instead of many offices.</p></div>
+    <!-- 01 MANIFESTO / ABOUT -->
+    <section class="sec manifesto" id="about" data-sec="01" data-name="Who we are" data-wipe>
+      <div class="wrap g12">
+        <span class="sec__num t-num" aria-hidden="true">01</span>
+        <p class="side mono" aria-hidden="true">Business Bridge Egypt — Independent by nature</p>
+        <p class="kick mono" data-fade><b>01</b> Who we are</p>
+        <p class="manifesto__text" data-words>Business is not built on connections alone. It is built on what those connections make <span class="hl acc">possible.</span> We move beyond introductions and discussions toward meaningful <span class="hl">cooperation and action.</span></p>
+        <div class="manifesto__foot">
+          <div data-fade><span class="mono">A</span><h3 class="t-h3">Independent by nature</h3><p>An independent facilitation and strategic advisory company — our only agenda is your progress in Egypt.</p></div>
+          <div data-fade><span class="mono">B</span><h3 class="t-h3">Connected by purpose</h3><p>Local market knowledge, professional expertise and business relationships, brought together around your objectives.</p></div>
+          <div data-fade><span class="mono">C</span><h3 class="t-h3">One point of contact</h3><p>We coordinate what your business needs in Egypt, so you speak to one partner instead of many offices.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 WHY EGYPT: pinned particle stage -->
+    <section class="egypt" id="egypt" data-sec="02" data-name="Why Egypt">
+      <div class="dm" data-cursor="Click">
+        <div class="dm__stage">
+          <div class="dm__gl" aria-hidden="true"></div>
+          <div class="dm__shade" aria-hidden="true"></div>
+          <div class="dm__frame" aria-hidden="true">
+            <span class="dm__corner mono dm__corner--tl">Fig. 02 — Egypt in five figures</span>
+            <span class="dm__corner mono dm__corner--tr"><b class="dm__state">01</b> / 05</span>
+            <span class="dm__corner mono dm__corner--bl">Move to disturb · Click to scatter</span>
+            <span class="dm__corner mono dm__corner--br">Sources: CAPMAS · IDSC · SCZONE · GAFI</span>
+          </div>
+          <div class="dm__ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><b class="dm__tick-fill"></b></div>
+
+          <div class="dm__caps">
+            <div class="dm__cap dm__cap--intro" data-state="0">
+              <p class="kick mono"><b>02</b> Why Egypt</p>
+              <h2 class="t-disp t-h2" data-title data-vel>A gateway between three <em>continents.</em></h2>
+              <p class="lead">Egypt combines a large home market with access to Africa, the Middle East and Europe — and one of the world’s key trade routes runs through it.</p>
+            </div>
+            <!-- Source: CAPMAS population clock, 19 Sep 2026 (109,540,965) — egypttoday.com/Article/1/149579 -->
+            <div class="dm__cap stat" data-state="1">
+              <p class="stat__k mono">Population</p>
+              <div class="stat__num t-num"><span data-count="109.5" data-decimals="1">109.5</span><small>M</small></div>
+              <p class="stat__label">people — the largest population in the Arab world and a young workforce.</p>
+              <p class="stat__src mono">Source — CAPMAS, Sep 2026</p>
+            </div>
+            <!-- Source: IDSC / Egyptian Cabinet report via Ahram Online, 4 Aug 2026 -->
+            <div class="dm__cap stat" data-state="2">
+              <p class="stat__k mono">Suez Canal</p>
+              <div class="stat__num t-num"><small class="pre">~</small><span data-count="12">12</span><small>%</small></div>
+              <p class="stat__label">of global maritime trade passes through the Suez Canal.</p>
+              <p class="stat__src mono">Source — Cabinet IDSC, 2026</p>
+            </div>
+            <!-- Source: DLA Piper, "Investment considerations in SCZONE", Feb 2026 -->
+            <div class="dm__cap stat" data-state="3">
+              <p class="stat__k mono">SCZONE</p>
+              <div class="stat__num t-num"><span data-count="455">455</span><small>km²</small></div>
+              <p class="stat__label">Suez Canal Economic Zone — four industrial sub-zones and six ports.</p>
+              <p class="stat__src mono">Source — SCZONE / DLA Piper, 2026</p>
+            </div>
+            <!-- Source: GAFI (General Authority for Investment and Free Zones) — Trade Agreements page -->
+            <div class="dm__cap stat" data-state="4">
+              <p class="stat__k mono">Trade agreements</p>
+              <div class="stat__num t-num"><span data-count="1.5" data-decimals="1">1.5</span><small>B</small></div>
+              <p class="stat__label">consumers reachable through Egypt’s free trade agreements.</p>
+              <p class="stat__src mono">Source — GAFI</p>
             </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- WHY EGYPT -->
-    <section class="egypt section" id="egypt">
-      <div class="wrap">
-        <div class="egypt__head">
-          <div>
-            <p class="eyebrow" data-fade>Why Egypt</p>
-            <h2 class="h2" data-split style="margin-top:24px">A gateway between <em>three continents.</em></h2>
-          </div>
-          <p class="lead" data-fade>Egypt combines a large home market with access to Africa, the Middle East and Europe — and one of the world’s key trade routes runs through it.</p>
-        </div>
-
-        <div class="stats">
-          <!-- Source: CAPMAS population clock, 19 Sep 2026 (109,540,965) — egypttoday.com/Article/1/149579 -->
-          <div class="stat" data-fade>
-            <div class="stat__num"><span data-count="109.5" data-decimals="1">0</span><small>M</small></div>
-            <p class="stat__label">people — the largest population in the Arab world and a young workforce.</p>
-            <p class="stat__src">CAPMAS, Sep 2026</p>
-          </div>
-          <!-- Source: IDSC / Egyptian Cabinet report via Ahram Online, 4 Aug 2026 -->
-          <div class="stat" data-fade>
-            <div class="stat__num">~<span data-count="12">0</span><small>%</small></div>
-            <p class="stat__label">of global maritime trade passes through the Suez Canal.</p>
-            <p class="stat__src">Cabinet IDSC, 2026</p>
-          </div>
-          <!-- Source: DLA Piper, "Investment considerations in SCZONE", Feb 2026 -->
-          <div class="stat" data-fade>
-            <div class="stat__num"><span data-count="455">0</span><small>km²</small></div>
-            <p class="stat__label">Suez Canal Economic Zone — four industrial sub-zones and six ports.</p>
-            <p class="stat__src">SCZONE / DLA Piper, 2026</p>
-          </div>
-          <!-- Source: GAFI (General Authority for Investment and Free Zones) — Trade Agreements page -->
-          <div class="stat" data-fade>
-            <div class="stat__num"><span data-count="1.5" data-decimals="1">0</span><small>B</small></div>
-            <p class="stat__label">consumers reachable through Egypt’s free trade agreements.</p>
-            <p class="stat__src">GAFI</p>
-          </div>
-        </div>
-
-        <div class="egypt__points">
-          <div class="point" data-fade><span class="point__n">01</span><p>A strategic location linking Africa, the Middle East and Europe.</p></div>
-          <div class="point" data-fade><span class="point__n">02</span><p>Access to regional markets through trade agreements — EU, GAFTA, COMESA, AfCFTA and more.</p></div>
-          <div class="point" data-fade><span class="point__n">03</span><p>Economic zones and investment incentives for manufacturers and investors.</p></div>
-          <div class="point" data-fade><span class="point__n">04</span><p>Major investment in infrastructure, ports, logistics and energy.</p></div>
-          <div class="point" data-fade><span class="point__n">05</span><p>A large domestic market and a young, growing workforce.</p></div>
-          <div class="point" data-fade><span class="point__n">06</span><p>The Suez Canal — one of the world’s key trade routes.</p></div>
+      <div class="sec egypt__points-wrap" data-wipe>
+        <div class="wrap g12">
+          <p class="kick mono egypt__points-kick" data-fade><b>02.1</b> Six reasons, briefly</p>
+          <ol class="points">
+            <li data-fade><span class="mono">01</span><p>A strategic location linking Africa, the Middle East and Europe.</p></li>
+            <li data-fade><span class="mono">02</span><p>Access to regional markets through trade agreements — EU, GAFTA, COMESA, AfCFTA and more.</p></li>
+            <li data-fade><span class="mono">03</span><p>Economic zones and investment incentives for manufacturers and investors.</p></li>
+            <li data-fade><span class="mono">04</span><p>Major investment in infrastructure, ports, logistics and energy.</p></li>
+            <li data-fade><span class="mono">05</span><p>A large domestic market and a young, growing workforce.</p></li>
+            <li data-fade><span class="mono">06</span><p>The Suez Canal — one of the world’s key trade routes.</p></li>
+          </ol>
         </div>
       </div>
     </section>
 
-    <!-- WHO WE WORK WITH -->
-    <section class="clients section" id="clients">
-      <div class="wrap">
-        <div class="clients__head">
-          <div>
-            <p class="eyebrow" data-fade>Who we work with</p>
-            <h2 class="h2" data-split style="margin-top:24px">Built for businesses with <em>ambitions in Egypt.</em></h2>
-          </div>
-          <p class="lead" data-fade>Whether you are taking your first step into the market or expanding an established operation, we meet you where you are.</p>
-        </div>
-        <div class="clients__grid">
-          <article class="client" data-fade><svg class="icon"><use href="#i-globe" /></svg><div><span class="client__n">01</span><h3>International companies</h3><p>Entering the Egyptian market for the first time.</p></div></article>
-          <article class="client" data-fade><svg class="icon"><use href="#i-chart" /></svg><div><span class="client__n">02</span><h3>Investors</h3><p>Looking for projects and opportunities in Egypt.</p></div></article>
-          <article class="client" data-fade><svg class="icon"><use href="#i-factory" /></svg><div><span class="client__n">03</span><h3>Manufacturers &amp; industrial groups</h3><p>Seeking production or logistics locations.</p></div></article>
-          <article class="client" data-fade><svg class="icon"><use href="#i-ship" /></svg><div><span class="client__n">04</span><h3>Exporters, importers &amp; distributors</h3><p>Building supply chains and sales networks.</p></div></article>
-          <article class="client" data-fade><svg class="icon"><use href="#i-grow" /></svg><div><span class="client__n">05</span><h3>Growing SMEs</h3><p>Expanding into Egypt, Africa and the Middle East.</p></div></article>
-          <article class="client" data-fade><svg class="icon"><use href="#i-handshake" /></svg><div><span class="client__n">06</span><h3>Chambers &amp; business organisations</h3><p>Developing cooperation and business missions.</p></div></article>
-        </div>
+    <!-- 03 WHO WE WORK WITH -->
+    <section class="sec clients" id="clients" data-sec="03" data-name="Who we work with" data-wipe>
+      <div class="wrap g12">
+        <span class="sec__num t-num" aria-hidden="true">03</span>
+        <p class="side mono" aria-hidden="true">Who we work with — six profiles</p>
+        <p class="kick mono" data-fade><b>03</b> Who we work with</p>
+        <h2 class="t-disp t-h2 sec__title" data-title data-vel>Built for businesses with <em>ambitions</em> in Egypt.</h2>
+        <p class="lead sec__lead" data-fade>Whether you are taking your first step into the market or expanding an established operation, we meet you where you are.</p>
+        <ol class="clients__list">
+          <li class="client" data-fade><span class="client__n t-num">01</span><h3 class="t-h3">International companies</h3><p>Entering the Egyptian market for the first time.</p><svg class="icon" aria-hidden="true"><use href="#i-globe" /></svg></li>
+          <li class="client" data-fade><span class="client__n t-num">02</span><h3 class="t-h3">Investors</h3><p>Looking for projects and opportunities in Egypt.</p><svg class="icon" aria-hidden="true"><use href="#i-chart" /></svg></li>
+          <li class="client" data-fade><span class="client__n t-num">03</span><h3 class="t-h3">Manufacturers &amp; industrial groups</h3><p>Seeking production or logistics locations.</p><svg class="icon" aria-hidden="true"><use href="#i-factory" /></svg></li>
+          <li class="client" data-fade><span class="client__n t-num">04</span><h3 class="t-h3">Exporters, importers &amp; distributors</h3><p>Building supply chains and sales networks.</p><svg class="icon" aria-hidden="true"><use href="#i-ship" /></svg></li>
+          <li class="client" data-fade><span class="client__n t-num">05</span><h3 class="t-h3">Growing SMEs</h3><p>Expanding into Egypt, Africa and the Middle East.</p><svg class="icon" aria-hidden="true"><use href="#i-grow" /></svg></li>
+          <li class="client" data-fade><span class="client__n t-num">06</span><h3 class="t-h3">Chambers &amp; business organisations</h3><p>Developing cooperation and business missions.</p><svg class="icon" aria-hidden="true"><use href="#i-handshake" /></svg></li>
+        </ol>
       </div>
     </section>
 
-    <!-- SERVICES: the hall of monoliths -->
-    <section class="services" id="services">
-      <div class="wrap services__intro">
-        <div>
-          <p class="eyebrow" data-fade>What we do</p>
-          <h2 class="h2" data-split style="margin-top:24px">Eight services. <em>One point of contact.</em></h2>
+    <!-- 04 SERVICES: the hall of monoliths -->
+    <section class="services" id="services" data-sec="04" data-name="Services">
+      <div class="sec services__intro" data-wipe>
+        <div class="wrap g12">
+          <span class="sec__num t-num" aria-hidden="true">04</span>
+          <p class="side mono" aria-hidden="true">What we do — the hall of monoliths</p>
+          <p class="kick mono" data-fade><b>04</b> What we do</p>
+          <h2 class="t-disp t-h2 sec__title" data-title data-vel>Eight services. <em>One</em> point of contact.</h2>
+          <p class="lead sec__lead" data-fade>From the first market question to long-term growth, we coordinate what your business needs in Egypt.</p>
         </div>
-        <p class="lead" data-fade>From the first market question to long-term growth, we coordinate what your business needs in Egypt.</p>
       </div>
       <div class="hall">
-        <div class="hall__stage">
+        <div class="hall__stage" data-cursor="Drag">
           <div class="hall__fallback"></div>
           <div class="hall__gl" aria-hidden="true"></div>
           <div class="hall__shade" aria-hidden="true"></div>
+          <div class="hall__big t-num" aria-hidden="true"><span>01</span></div>
           <div class="hall__panel">
-          <article class="hall__item is-active" data-i="0">
-            <span class="hall__num">01 <i>/ 08</i></span>
-            <h3>Market Research &amp; Feasibility Studies</h3>
+<article class="hall__item is-active" data-i="0">
+            <span class="hall__num mono"><b>01</b> / 08 — Service</span>
+            <h3 class="t-disp">Market Research &amp; Feasibility Studies</h3>
             <p>Before any commitment, you need a clear picture of the market. Market intelligence tailored to your sector, and feasibility work that weighs risks and returns.</p>
             <ul><li>Sector and market intelligence</li><li>Competitor and customer insights</li><li>Overview of the regulatory landscape</li><li>Feasibility study coordination</li><li>Site selection and comparative analysis</li></ul>
           </article>
           <article class="hall__item" data-i="1">
-            <span class="hall__num">02 <i>/ 08</i></span>
-            <h3>Business Establishment &amp; Corporate Services</h3>
+            <span class="hall__num mono"><b>02</b> / 08 — Service</span>
+            <h3 class="t-disp">Business Establishment &amp; Corporate Services</h3>
             <p>Setting up involves many steps and many offices. We coordinate the full process so your company is registered, licensed and ready to operate.</p>
             <ul><li>Company formation and registration</li><li>Licensing and permits coordination</li><li>Tax and trade registration support</li><li>Administrative coordination</li><li>Operational setup: office, utilities, telecom</li></ul>
           </article>
           <article class="hall__item" data-i="2">
-            <span class="hall__num">03 <i>/ 08</i></span>
-            <h3>Strategic Partnerships &amp; Business Development</h3>
+            <span class="hall__num mono"><b>03</b> / 08 — Service</span>
+            <h3 class="t-disp">Strategic Partnerships &amp; Business Development</h3>
             <p>The right partner is the difference between a slow start and real momentum. We identify and introduce reliable partners aligned with your objectives.</p>
             <ul><li>Partner, distributor and supplier matchmaking</li><li>Introductions to potential clients</li><li>B2B meetings and business missions</li><li>Support for trade fairs and events</li><li>Follow-up until cooperation is in place</li></ul>
           </article>
           <article class="hall__item" data-i="3">
-            <span class="hall__num">04 <i>/ 08</i></span>
-            <h3>Government Liaison &amp; Investment Facilitation</h3>
+            <span class="hall__num mono"><b>04</b> / 08 — Service</span>
+            <h3 class="t-disp">Government Liaison &amp; Investment Facilitation</h3>
             <p>Clear, consistent communication with public institutions. We help you prepare, submit and follow up — and understand the incentives that may apply.</p>
             <ul><li>Coordination with relevant authorities</li><li>Investment procedure support and follow-up</li><li>Guidance on incentives and tax benefits</li><li>Information on economic and free zones</li><li>Investor visa and residency facilitation</li></ul>
           </article>
           <article class="hall__item" data-i="4">
-            <span class="hall__num">05 <i>/ 08</i></span>
-            <h3>Real Estate &amp; Industrial Opportunities</h3>
+            <span class="hall__num mono"><b>05</b> / 08 — Service</span>
+            <h3 class="t-disp">Real Estate &amp; Industrial Opportunities</h3>
             <p>Location shapes cost, logistics and growth. We find commercial, industrial and logistics sites that match your operational needs and expansion plans.</p>
             <ul><li>Office and commercial space</li><li>Industrial facilities and warehouses</li><li>Land and industrial park options</li><li>Site visits and comparison</li><li>Lease and purchase negotiation support</li></ul>
           </article>
           <article class="hall__item" data-i="5">
-            <span class="hall__num">06 <i>/ 08</i></span>
-            <h3>Banking &amp; Financial Relations</h3>
+            <span class="hall__num mono"><b>06</b> / 08 — Service</span>
+            <h3 class="t-disp">Banking &amp; Financial Relations</h3>
             <p>A smooth financial setup is essential from day one. Introductions to banks and financial institutions, and coordination of the steps that follow.</p>
             <ul><li>Banking introductions</li><li>Account opening coordination</li><li>Relationships with financial institutions</li><li>Coordination with financial service providers</li><li>Ongoing administrative support</li></ul>
           </article>
           <article class="hall__item" data-i="6">
-            <span class="hall__num">07 <i>/ 08</i></span>
-            <h3>Legal &amp; Regulatory Coordination</h3>
+            <span class="hall__num mono"><b>07</b> / 08 — Service</span>
+            <h3 class="t-disp">Legal &amp; Regulatory Coordination</h3>
             <p>Every investment must stand on solid legal ground. We connect you with qualified legal professionals and coordinate corporate and regulatory matters.</p>
             <ul><li>Access to qualified law firms</li><li>Coordination of corporate matters</li><li>Contract and compliance coordination</li><li>Labour and employment matters</li><li>Regulatory follow-up</li></ul>
             <p class="svc__note">Legal advice is provided by licensed legal professionals.</p>
           </article>
           <article class="hall__item" data-i="7">
-            <span class="hall__num">08 <i>/ 08</i></span>
-            <h3>Ongoing Business Advisory</h3>
+            <span class="hall__num mono"><b>08</b> / 08 — Service</span>
+            <h3 class="t-disp">Ongoing Business Advisory</h3>
             <p>Our role does not end once you are established. We remain a practical partner as your business grows and expands in Egypt and the region.</p>
             <ul><li>Business development support</li><li>Operational coordination</li><li>Expansion planning</li><li>Recruitment and workforce coordination</li><li>Networking with industry peers</li></ul>
           </article>
           </div>
           <ol class="hall__index" aria-label="Services">
-            <li><button type="button" data-goto="0"><span>01</span></button></li><li><button type="button" data-goto="1"><span>02</span></button></li><li><button type="button" data-goto="2"><span>03</span></button></li><li><button type="button" data-goto="3"><span>04</span></button></li><li><button type="button" data-goto="4"><span>05</span></button></li><li><button type="button" data-goto="5"><span>06</span></button></li><li><button type="button" data-goto="6"><span>07</span></button></li><li><button type="button" data-goto="7"><span>08</span></button></li>
+            <li><button type="button" data-goto="0" data-cursor="Click"><span>01</span></button></li><li><button type="button" data-goto="1" data-cursor="Click"><span>02</span></button></li><li><button type="button" data-goto="2" data-cursor="Click"><span>03</span></button></li><li><button type="button" data-goto="3" data-cursor="Click"><span>04</span></button></li><li><button type="button" data-goto="4" data-cursor="Click"><span>05</span></button></li><li><button type="button" data-goto="5" data-cursor="Click"><span>06</span></button></li><li><button type="button" data-goto="6" data-cursor="Click"><span>07</span></button></li><li><button type="button" data-goto="7" data-cursor="Click"><span>08</span></button></li>
           </ol>
-          <div class="hall__progress" aria-hidden="true"><i></i></div>
+          <div class="hall__foot mono" aria-hidden="true"><span>← Drag · Scroll · Keys →</span><div class="hall__progress"><i></i></div><span class="hall__count">01 / 08</span></div>
         </div>
       </div>
     </section>
 
-    <!-- METHOD: the bridge builds itself -->
-    <section class="method" id="method">
+    <!-- 05 METHOD: the bridge builds itself -->
+    <section class="method" id="method" data-sec="05" data-name="How we work">
       <div class="method__stage">
         <div class="method__fallback"></div>
         <div class="method__gl" aria-hidden="true"></div>
         <div class="method__head">
-          <p class="eyebrow">How we work</p>
-          <h2 class="h2">Understand. Connect. Coordinate. <em>Act.</em></h2>
+          <p class="kick mono"><b>05</b> How we work</p>
+          <h2 class="t-disp t-h2" data-title data-vel>Understand. Connect. Coordinate. <em>Act.</em></h2>
         </div>
         <div class="method__steps">
-          <div class="mstep" data-step="0"><span class="mstep__n">01</span><h3>Understand</h3><p>Define objectives and priorities.</p></div>
-          <div class="mstep" data-step="1"><span class="mstep__n">02</span><h3>Connect</h3><p>Identify people and capabilities.</p></div>
-          <div class="mstep" data-step="2"><span class="mstep__n">03</span><h3>Coordinate</h3><p>Align processes and participants.</p></div>
-          <div class="mstep mstep--act" data-step="3"><span class="mstep__n">04</span><h3>Act</h3><p>Support practical next steps.</p></div>
+          <div class="mstep" data-step="0"><span class="mstep__n mono">01 / Pillar</span><h3>Understand</h3><p>Define objectives and priorities.</p></div>
+          <div class="mstep" data-step="1"><span class="mstep__n mono">02 / Pillar</span><h3>Connect</h3><p>Identify people and capabilities.</p></div>
+          <div class="mstep" data-step="2"><span class="mstep__n mono">03 / Pillar</span><h3>Coordinate</h3><p>Align processes and participants.</p></div>
+          <div class="mstep mstep--act" data-step="3"><span class="mstep__n mono">04 / Pillar</span><h3>Act</h3><p>Support practical next steps.</p></div>
         </div>
       </div>
     </section>
 
-    <!-- JOURNEY -->
-    <section class="journey section" id="journey">
-      <div class="wrap">
-        <div class="journey__head">
-          <div>
-            <p class="eyebrow" data-fade>Your journey with us</p>
-            <h2 class="h2" data-split style="margin-top:24px">One partner across your <em>whole investment journey.</em></h2>
-          </div>
-          <p class="lead" data-fade>From the first market question to long-term growth — four stages, one continuous relationship.</p>
-        </div>
+    <!-- 06 JOURNEY -->
+    <section class="sec journey" id="journey" data-sec="06" data-name="Your journey" data-wipe>
+      <div class="wrap g12">
+        <span class="sec__num t-num" aria-hidden="true">06</span>
+        <p class="side mono" aria-hidden="true">Your journey with us — four stages</p>
+        <p class="kick mono" data-fade><b>06</b> Your journey with us</p>
+        <h2 class="t-disp t-h2 sec__title" data-title data-vel>One partner across your whole investment <em>journey.</em></h2>
+        <p class="lead sec__lead" data-fade>From the first market question to long-term growth — four stages, one continuous relationship.</p>
         <div class="journey__rail">
           <div class="journey__line"><i></i></div>
-          <div class="stage"><span class="stage__n">Stage 01</span><h3>Before entry</h3><ul><li>Market and sector research</li><li>Feasibility coordination</li><li>Site selection</li><li>Partner identification</li></ul></div>
-          <div class="stage"><span class="stage__n">Stage 02</span><h3>Setting up</h3><ul><li>Company formation</li><li>Licensing and registration</li><li>Banking setup</li><li>Legal coordination</li></ul></div>
-          <div class="stage"><span class="stage__n">Stage 03</span><h3>Operating</h3><ul><li>Office and facilities</li><li>Recruitment coordination</li><li>Regulatory follow-up</li><li>Institutional communication</li></ul></div>
-          <div class="stage"><span class="stage__n">Stage 04</span><h3>Growing</h3><ul><li>Expansion planning</li><li>New partners and clients</li><li>Business missions</li><li>Ongoing advisory</li></ul></div>
+          <div class="stage"><span class="stage__n t-num">01</span><p class="mono stage__k">Stage 01</p><h3 class="t-h3">Before entry</h3><ul><li>Market and sector research</li><li>Feasibility coordination</li><li>Site selection</li><li>Partner identification</li></ul></div>
+          <div class="stage"><span class="stage__n t-num">02</span><p class="mono stage__k">Stage 02</p><h3 class="t-h3">Setting up</h3><ul><li>Company formation</li><li>Licensing and registration</li><li>Banking setup</li><li>Legal coordination</li></ul></div>
+          <div class="stage"><span class="stage__n t-num">03</span><p class="mono stage__k">Stage 03</p><h3 class="t-h3">Operating</h3><ul><li>Office and facilities</li><li>Recruitment coordination</li><li>Regulatory follow-up</li><li>Institutional communication</li></ul></div>
+          <div class="stage"><span class="stage__n t-num">04</span><p class="mono stage__k">Stage 04</p><h3 class="t-h3">Growing</h3><ul><li>Expansion planning</li><li>New partners and clients</li><li>Business missions</li><li>Ongoing advisory</li></ul></div>
         </div>
       </div>
     </section>
 
-    <!-- WHY US -->
-    <section class="why section" id="why">
-      <div class="wrap why__inner">
-        <div>
-          <p class="eyebrow" data-fade>Why Business Bridge</p>
-          <h2 class="h2" data-split style="margin-top:24px">Because opportunities require <em>more than introductions.</em></h2>
-          <p class="lead" data-fade style="margin-top:28px">We focus on connecting the right people, resources and expertise to help business initiatives move forward.</p>
-        </div>
+    <!-- 07 WHY US -->
+    <section class="sec why" id="why" data-sec="07" data-name="Why Business Bridge" data-wipe>
+      <div class="wrap g12">
+        <span class="sec__num t-num" aria-hidden="true">07</span>
+        <p class="side mono" aria-hidden="true">Why Business Bridge — more than introductions</p>
+        <p class="kick mono" data-fade><b>07</b> Why Business Bridge</p>
+        <h2 class="t-disp t-h2 sec__title" data-title data-vel>Because opportunities require <em>more</em> than introductions.</h2>
+        <p class="lead sec__lead" data-fade>We focus on connecting the right people, resources and expertise to help business initiatives move forward.</p>
         <div class="why__values">
-          <div class="value" data-fade><b>i.</b><div><h3>Flexible</h3><p>Engagements shaped around your stage, sector and pace.</p></div></div>
-          <div class="value" data-fade><b>ii.</b><div><h3>Practical</h3><p>Focused on concrete next steps, not reports that sit on a shelf.</p></div></div>
-          <div class="value" data-fade><b>iii.</b><div><h3>Relationship-driven</h3><p>Long-term partnership built on trust and follow-through.</p></div></div>
+          <div class="value" data-fade><b class="t-num">01</b><h3 class="t-h3">Flexible</h3><p>Engagements shaped around your stage, sector and pace.</p></div>
+          <div class="value" data-fade><b class="t-num">02</b><h3 class="t-h3">Practical</h3><p>Focused on concrete next steps, not reports that sit on a shelf.</p></div>
+          <div class="value" data-fade><b class="t-num">03</b><h3 class="t-h3">Relationship-driven</h3><p>Long-term partnership built on trust and follow-through.</p></div>
         </div>
       </div>
     </section>
 
-    <!-- CONTACT -->
-    <section class="contact section" id="contact">
-      <div class="wrap">
-        <p class="eyebrow" data-fade style="color:var(--blue-ink)">Contact</p>
-        <h2 class="contact__big" data-split style="margin-top:28px">Let’s move business <em>forward.</em></h2>
+    <!-- 08 CONTACT -->
+    <section class="sec contact" id="contact" data-sec="08" data-name="Contact" data-wipe>
+      <div class="wrap g12">
+        <p class="side mono" aria-hidden="true">New Cairo · 30.03° N 31.47° E</p>
+        <p class="kick mono" data-fade><b>08</b> Contact</p>
+        <h2 class="t-disp contact__big" data-title data-vel>Let’s move business <em>forward.</em></h2>
         <div class="contact__grid">
-          <div class="contact__item" data-fade><h4>Email</h4><a href="mailto:galal@binvestb.com">galal@binvestb.com</a></div>
-          <div class="contact__item" data-fade><h4>Phone</h4><a href="tel:+201202011120">+20 12 02011120</a></div>
-          <div class="contact__item" data-fade><h4>Office</h4><address>Villa 97, El Yasmin 7,<br />Fifth Settlement, New Cairo<br />Egypt</address></div>
+          <div class="contact__item" data-fade><h4 class="mono">E — Email</h4><a href="mailto:galal@binvestb.com">galal@binvestb.com</a></div>
+          <div class="contact__item" data-fade><h4 class="mono">T — Phone</h4><a href="tel:+201202011120">+20 12 02011120</a></div>
+          <div class="contact__item" data-fade><h4 class="mono">A — Office</h4><address>Villa 97, El Yasmin 7,<br />Fifth Settlement, New Cairo<br />Egypt</address></div>
         </div>
         <div class="contact__actions" data-fade>
-          <a class="btn btn--solid" href="mailto:galal@binvestb.com?subject=Business%20in%20Egypt%20%E2%80%94%20introduction" data-magnetic>Write to us <svg class="arrow"><use href="#i-arrow" /></svg></a>
-          <a class="btn btn--ghost" href="https://wa.me/201202011120" target="_blank" rel="noopener" data-magnetic>WhatsApp</a>
-          <a class="btn btn--ghost" href="https://www.google.com/maps/search/?api=1&query=El+Yasmin+7+Fifth+Settlement+New+Cairo" target="_blank" rel="noopener" data-magnetic>Open in Maps</a>
+          <a class="btn btn--solid" href="mailto:galal@binvestb.com?subject=Business%20in%20Egypt%20%E2%80%94%20introduction" data-magnetic><span>Write to us</span><svg class="arrow"><use href="#i-arrow" /></svg></a>
+          <a class="btn btn--line" href="https://wa.me/201202011120" target="_blank" rel="noopener" data-magnetic><span>WhatsApp</span></a>
+          <a class="btn btn--line" href="https://www.google.com/maps/search/?api=1&amp;query=El+Yasmin+7+Fifth+Settlement+New+Cairo" target="_blank" rel="noopener" data-magnetic><span>Open in Maps</span></a>
         </div>
       </div>
     </section>
@@ -407,13 +447,15 @@
     <div class="wrap">
       <div class="footer__top">
         <a class="footer__logo" href="#top"><img src="/brand/logo-light.png" alt="Business Bridge Egypt" width="800" height="441" loading="lazy" /></a>
-        <nav class="footer__nav" aria-label="Footer">
-          <a href="#about">About</a><a href="#egypt">Why Egypt</a><a href="#services">Services</a><a href="#method">How we work</a><a href="#journey">Journey</a><a href="#contact">Contact</a>
+        <nav class="footer__nav mono" aria-label="Footer">
+          <a href="#about">01 About</a><a href="#egypt">02 Why Egypt</a><a href="#services">04 Services</a><a href="#method">05 How we work</a><a href="#journey">06 Journey</a><a href="#contact">08 Contact</a>
         </nav>
       </div>
-      <div class="footer__bottom">
+      <p class="footer__word t-disp" aria-hidden="true">Beyond words! <em>Act!</em></p>
+      <div class="footer__bottom mono">
         <span>© <span data-year>2026</span> Business Bridge Egypt. All rights reserved.</span>
-        <b>BEYOND WORDS! ACT!</b>
+        <span>New Cairo · Egypt</span>
+        <b>Beyond Words! Act!</b>
       </div>
     </div>
   </footer>

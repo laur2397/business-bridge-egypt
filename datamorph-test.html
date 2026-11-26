@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DataMorph — test</title>
+<link rel="icon" href="data:," />
+<style>
+  html, body { margin: 0; height: 100%; background: #050B1A; overflow: hidden; color: #F0D3A4; }
+  #stage { position: fixed; inset: 0; }
+  #ui { position: fixed; left: 24px; bottom: 22px; z-index: 2; display: flex; gap: 14px; align-items: center;
+    font: 500 11px/1 "JetBrains Mono Variable", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; }
+  #ui input { width: min(48vw, 420px); accent-color: #D9B27C; }
+  #ui button { background: none; border: 1px solid #D9B27C66; color: inherit; font: inherit; padding: 6px 10px; cursor: pointer; }
+  #err { position: fixed; top: 20px; left: 20px; color: #f88; font: 13px monospace; z-index: 3; }
+  body.noui #ui { display: none; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="ui">
+  <span id="lab">P 0.00</span>
+  <input id="sl" type="range" min="0" max="1" step="0.001" value="0" />
+  <button id="pz">Pause</button>
+</div>
+<div id="err"></div>
+<script type="module">
+  import '@fontsource-variable/jetbrains-mono';
+  import { createDataMorph } from './src/showcase/datamorph.js';
+  const q = new URLSearchParams(location.search);
+  if (q.has('noui')) document.body.classList.add('noui');
+  window.__ready = false;
+  try {
+    const dm = createDataMorph(document.getElementById('stage'), { quality: q.get('q') === 'low' ? 'low' : 'high' });
+    window.__dm = dm;
+    const p0 = parseFloat(q.get('p') || '0');
+    const sl = document.getElementById('sl'), lab = document.getElementById('lab');
+    const setP = (p) => { dm.setProgress(p); sl.value = p; lab.textContent = 'P ' + (+p).toFixed(2); };
+    setP(p0);
+    sl.addEventListener('input', () => setP(+sl.value));
+    const toNdc = (e) => [(e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1];
+    const stage = document.getElementById('stage');
+    stage.addEventListener('pointermove', (e) => dm.setPointer(...toNdc(e)));
+    stage.addEventListener('pointerleave', () => dm.setPointer(NaN, NaN));
+    stage.addEventListener('pointerdown', (e) => dm.burst(...toNdc(e)));
+    let paused = false;
+    document.getElementById('pz').onclick = (e) => { paused = !paused; paused ? dm.pause() : dm.resume(); e.target.textContent = paused ? 'Resume' : 'Pause'; };
+    addEventListener('wheel', (e) => setP(Math.min(1, Math.max(0, +sl.value + e.deltaY * 0.0006))), { passive: true });
+    dm.ready.then(() => { if (q.has('p')) dm._debug.jump(p0); window.__ready = true; }).catch((e) => { document.getElementById('err').textContent = String(e); console.error(e); });
+  } catch (e) {
+    document.getElementById('err').textContent = String(e);
+    console.error(e);
+  }
+</script>
+</body>
+</html>
