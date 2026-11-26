@@ -83,10 +83,29 @@ function splitChars(el) {
     });
   };
   walk(el);
+  if (el.classList.contains('t-disp') || el.closest('.t-disp')) { lockedTitles.add(el); lockWords(el); }
   if (/^H\d$/.test(el.tagName) || el.tagName === 'P') el.setAttribute('aria-label', label);
   [...el.children].forEach((c) => c.setAttribute('aria-hidden', 'true'));
   return [...el.querySelectorAll('.char')];
 }
+/** Lock every word box to its final (fully widened) width, so line breaks and positions never move
+ *  while the characters animate their width axis. Without this the whole title reflows every frame. */
+const lockedTitles = new Set();
+function lockWords(root) {
+  const words = [...root.querySelectorAll('.t-disp .w, .t-disp.w')].filter((w) => !w.closest('.manifesto__text'));
+  words.forEach((w) => { w.style.width = ''; });
+  const chars = root.querySelectorAll('.t-disp .char');
+  const prev = [...chars].map((c) => c.style.getPropertyValue('--wd'));
+  chars.forEach((c) => c.style.removeProperty('--wd'));
+  const widths = words.map((w) => w.getBoundingClientRect().width);
+  words.forEach((w, i) => { if (widths[i]) w.style.width = `${Math.ceil(widths[i])}px`; });
+  chars.forEach((c, i) => { if (prev[i]) c.style.setProperty('--wd', prev[i]); });
+}
+function relockAll() { lockedTitles.forEach((el) => lockWords(el)); }
+(document.fonts?.ready || Promise.resolve()).then(relockAll);
+let relockT = 0;
+window.addEventListener('resize', () => { clearTimeout(relockT); relockT = setTimeout(relockAll, 120); });
+
 const targetWidth = (el) => parseFloat(getComputedStyle(el.closest('.t-disp') || el).getPropertyValue('--wd')) || 125;
 
 /** Signature: characters are born condensed (wdth 62) and blurred, then widen into place. */
@@ -322,7 +341,7 @@ gsap.ticker.add((time, dtMs) => {
   if (!reduced && Math.abs(vel.v - lastVelW) > 0.004) {
     lastVelW = vel.v;
     const a = Math.abs(vel.v);
-    const vw = (a * 48).toFixed(1), vs = `${(-vel.v * 9).toFixed(2)}deg`;
+    const vw = '0', vs = `${(-vel.v * 3.5).toFixed(2)}deg`;
     velEls.forEach((el) => { el.style.setProperty('--vw', vw); el.style.setProperty('--vs', vs); });
     marquee?.style.setProperty('--mvw', (a * 55).toFixed(1));
   }
