@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero scene test</title>
+<link rel="icon" href="data:," />
+<style>
+  html,body{margin:0;height:100%;background:#050B1A;overflow:hidden;font:12px/1.4 Inter,system-ui,sans-serif;color:#F4EFE6}
+  #stage{position:absolute;inset:0}
+  #ui{position:fixed;left:16px;bottom:16px;z-index:2;display:flex;gap:10px;align-items:center;background:rgba(5,11,26,.55);padding:8px 12px;border-radius:8px;backdrop-filter:blur(6px)}
+  #ui.hidden{display:none}
+  input[type=range]{width:260px}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="ui">
+  <label for="p">progress</label>
+  <input id="p" type="range" min="0" max="1" step="0.001" value="0" />
+  <output id="pv">0.000</output>
+  <button id="pause" type="button">pause</button>
+</div>
+<script type="module">
+  import { createHeroScene } from '/src/scene/hero.js';
+  const qs = new URLSearchParams(location.search);
+  const quality = qs.get('q') === 'low' ? 'low' : 'high';
+  const p0 = parseFloat(qs.get('p') || '0');
+  if (qs.has('noui')) document.getElementById('ui').classList.add('hidden');
+  const stage = document.getElementById('stage');
+  let hero;
+  try {
+    hero = createHeroScene(stage, { quality });
+  } catch (e) {
+    stage.style.background = 'linear-gradient(180deg,#0E2A5C 0%,#D9B27C 60%,#050B1A 100%)';
+    console.warn('fallback:', e.message);
+  }
+  window.__hero = hero;
+  const slider = document.getElementById('p'), out = document.getElementById('pv');
+  slider.value = p0; out.textContent = p0.toFixed(3);
+  if (hero) {
+    hero.setProgress(p0, { immediate: true });
+    slider.addEventListener('input', () => { hero.setProgress(+slider.value); out.textContent = (+slider.value).toFixed(3); });
+    addEventListener('pointermove', (e) => hero.setPointer(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight * 2 - 1)));
+    let paused = false;
+    document.getElementById('pause').addEventListener('click', (e) => { paused = !paused; paused ? hero.pause() : hero.resume(); e.target.textContent = paused ? 'resume' : 'pause'; });
+    hero.ready.then(() => { window.__heroReady = true; });
+  }
+</script>
+</body>
+</html>

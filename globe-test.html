@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:," />
+  <title>Globe test — Business Bridge Egypt</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #050B1A; color: #F4EFE6; font: 13px/1.4 Inter, system-ui, sans-serif; }
+    #stage { position: fixed; inset: 0; }
+    #ui { position: fixed; left: 16px; bottom: 16px; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      background: rgba(5, 11, 26, .6); padding: 10px 12px; border: 1px solid rgba(156, 195, 234, .2); border-radius: 10px; }
+    button { background: transparent; color: inherit; border: 1px solid rgba(156, 195, 234, .35); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+    button:focus-visible, input:focus-visible { outline: 2px solid #D9B27C; outline-offset: 2px; }
+    body.shot #ui { display: none; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="ui">
+    <label>progress <input id="p" type="range" min="0" max="1" step="0.001" value="0" /></label>
+    <output id="pv">0</output>
+    <button data-f="europe">europe</button>
+    <button data-f="gulf">gulf</button>
+    <button data-f="asia">asia</button>
+    <button data-f="americas">americas</button>
+    <button data-f="africa">africa</button>
+    <button data-f="">reset</button>
+  </div>
+  <script type="module">
+    import { createGlobe } from './src/scene/globe.js';
+    const stage = document.getElementById('stage');
+    const params = new URLSearchParams(location.search);
+    if (params.has('shot')) document.body.classList.add('shot');
+    const globe = createGlobe(stage, { quality: params.get('q') === 'low' ? 'low' : 'high' });
+    window.globe = globe;
+    const slider = document.getElementById('p');
+    const out = document.getElementById('pv');
+    slider.addEventListener('input', () => { globe.setProgress(+slider.value); out.textContent = (+slider.value).toFixed(2); });
+    document.querySelectorAll('[data-f]').forEach((b) => b.addEventListener('click', () => globe.focus(b.dataset.f || null)));
+    window.addEventListener('pointermove', (e) => globe.setPointer((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1));
+    globe.ready.then(() => { window.__globeReady = true; });
+  </script>
+</body>
+</html>
