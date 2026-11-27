@@ -42,3 +42,8 @@ For the custom domain `www.binvestb.com`:
 
 All company content comes from the official Business Bridge Egypt profile (v4).
 The figures about Egypt are cited inline in `index.html`: CAPMAS (population), IDSC / Egyptian Cabinet (Suez Canal share of trade), SCZONE / DLA Piper (economic zone area) and GAFI (trade agreements).
+
+## Hosting on cPanel (bbegypt.com, Hostico)
+
+Every push to `main` also builds the site for the domain root and publishes it to the `cpanel` branch (with `.cpanel.yml` and `.htaccess`).
+On the hosting: **cPanel → Git Version Control → business-bridge-egypt → Pull or Deploy → Update from Remote → Deploy HEAD Commit**. The site is copied into `public_html`.

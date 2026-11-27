@@ -39,3 +39,27 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # Builds the site for the domain root and publishes it to the "cpanel" branch.
+  # On the Hostico cPanel (bbegypt.com): Git Version Control → Update from Remote → Deploy HEAD Commit.
+  cpanel:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: bash deploy/build-cpanel.sh
+      - name: Publish the cpanel branch
+        run: |
+          cd cpanel-out
+          git init -q -b cpanel
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Built site for cPanel from ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" cpanel

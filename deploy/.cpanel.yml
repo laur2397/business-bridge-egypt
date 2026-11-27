@@ -1,0 +1,7 @@
+---
+# cPanel "Git Version Control" deployment for bbegypt.com.
+# After "Update from Remote", click "Deploy HEAD Commit": the built site is copied into public_html.
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/gsxcgpdo/public_html/
+    - /bin/cp -R assets brand textures index.html .htaccess $DEPLOYPATH
