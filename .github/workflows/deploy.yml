@@ -55,11 +55,22 @@ jobs:
       - run: npm ci
       - run: bash deploy/build-cpanel.sh
       - name: Publish the cpanel branch
+        # Adds a new commit on top of the existing cpanel branch (never rewrites it),
+        # so cPanel's "Update from Remote" is always a simple fast-forward pull.
+        env:
+          REPO_URL: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         run: |
-          cd cpanel-out
-          git init -q -b cpanel
+          mkdir -p "$RUNNER_TEMP/pub" && cd "$RUNNER_TEMP/pub"
+          if git ls-remote --exit-code --heads "$REPO_URL" cpanel >/dev/null; then
+            git clone -q --depth 1 --branch cpanel "$REPO_URL" .
+          else
+            git init -q -b cpanel && git remote add origin "$REPO_URL"
+          fi
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R "$GITHUB_WORKSPACE/cpanel-out/." .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          git diff --cached --quiet && { echo "No changes"; exit 0; }
           git commit -q -m "Built site for cPanel from ${GITHUB_SHA::7}"
-          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" cpanel
+          git push origin HEAD:cpanel
