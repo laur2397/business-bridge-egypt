@@ -61,7 +61,7 @@ export function createDataMorph(container, { quality = 'high' } = {}) {
   lose && lose.loseContext();
 
   const low = quality === 'low';
-  const TEX = low ? 200 : 400; // 40k / 160k particles
+  const TEX = low ? 180 : 300; // 32k / 90k particles
   const N = TEX * TEX;
   const reduced = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 

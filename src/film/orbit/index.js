@@ -164,7 +164,7 @@ function buildArc(a, b, segments = 160) {
 export function createChapter(ctx) {
   const { renderer, quality, reduced, base, assets } = ctx;
   const high = quality !== 'low';
-  const res = high ? '4k' : '2k';
+  const res = '2k'; // 4k doubled the download for a barely visible gain
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 16 / 9, 0.01, 50);

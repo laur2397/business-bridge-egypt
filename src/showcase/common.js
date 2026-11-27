@@ -92,7 +92,7 @@ export function createStage(container, { quality = 'high', exposure = 1, bloom =
   const renderer = new THREE.WebGLRenderer({
     canvas, antialias: false, alpha: false, stencil: false, powerPreference: 'high-performance',
   });
-  const dpr = high ? Math.min(window.devicePixelRatio || 1, 1.75) : 1;
+  const dpr = high ? Math.min(window.devicePixelRatio || 1, 1.25) : 1;
   renderer.setPixelRatio(dpr);
   renderer.setClearColor(clearColor, 1);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;

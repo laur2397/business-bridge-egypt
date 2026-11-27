@@ -16,7 +16,16 @@ const load = (path) => (skipGL(path) ? Promise.reject(new Error('nogl')) : modul
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const coarse = window.matchMedia('(pointer: coarse)').matches;
-const quality = coarse || window.innerWidth < 900 || (navigator.hardwareConcurrency || 8) <= 4 ? 'low' : 'high';
+// Quality tier: phones, small screens, weak CPUs and integrated Intel/software GPUs get the light version.
+const gpuName = (() => {
+  try {
+    const gl = document.createElement('canvas').getContext('webgl2');
+    const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+    return ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : '';
+  } catch { return ''; }
+})();
+const weakGpu = /intel|swiftshader|llvmpipe|mali|adreno|powervr/i.test(gpuName);
+const quality = coarse || weakGpu || window.innerWidth < 900 || (navigator.hardwareConcurrency || 8) <= 4 ? 'low' : 'high';
 if (reduced) document.documentElement.classList.add('reduced');
 document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
 

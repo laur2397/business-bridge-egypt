@@ -45,8 +45,9 @@ export function createFilm(container, { quality = 'high', reduced = false, onPro
   container.appendChild(canvas);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance', stencil: false });
-  const maxPR = quality === 'high' ? 1.5 : 1;
-  let pixelRatio = Math.min(window.devicePixelRatio || 1, maxPR);
+  // Start at 1.0 (Retina screens would otherwise render 2.25x the pixels); adapt up only if frames are fast.
+  const maxPR = quality === 'high' ? Math.min(window.devicePixelRatio || 1, 1.25) : 1;
+  let pixelRatio = Math.min(1, maxPR);
   renderer.setPixelRatio(pixelRatio);
   renderer.toneMapping = THREE.NoToneMapping;
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
@@ -55,7 +56,7 @@ export function createFilm(container, { quality = 'high', reduced = false, onPro
   const assets = createAssets(renderer, { onProgress });
   const ctx = { renderer, quality, reduced, base: import.meta.env.BASE_URL, assets };
 
-  const samples = quality === 'high' ? 4 : 0;
+  const samples = quality === 'high' ? 2 : 0;
   const rtA = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples });
   const rtB = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples });
 
@@ -174,7 +175,7 @@ export function createFilm(container, { quality = 'high', reduced = false, onPro
   let slowFrames = 0, fastFrames = 0;
   function adapt(dt) {
     if (dt > 1 / 42) { slowFrames++; fastFrames = 0; } else if (dt < 1 / 58) { fastFrames++; slowFrames = Math.max(0, slowFrames - 1); }
-    if (slowFrames > 60 && pixelRatio > 0.75) { pixelRatio = Math.max(0.75, pixelRatio - 0.2); slowFrames = 0; resize(); }
+    if (slowFrames > 24 && pixelRatio > 0.6) { pixelRatio = Math.max(0.6, pixelRatio - 0.15); slowFrames = 0; resize(); }
     if (fastFrames > 240 && pixelRatio < Math.min(window.devicePixelRatio || 1, maxPR)) { pixelRatio = Math.min(maxPR, pixelRatio + 0.1); fastFrames = 0; resize(); }
   }
 
@@ -339,14 +340,13 @@ export function createFilm(container, { quality = 'high', reduced = false, onPro
 
   // Ready: orbit first (it is the opening), river right after.
   const ready = (async () => {
-    const results = await Promise.allSettled([loadChapter('orbit'), loadChapter('river')]);
-    const errors = results.filter((r) => r.status === 'rejected');
-    if (errors.length) console.warn('[film] chapter failed:', errors.map((e) => e.reason?.message || e.reason));
-    if (!chapters.orbit && !chapters.river) throw new Error('No film chapters available');
-    // warm up: render both once so shaders are compiled before the user scrolls
+    // Only the opening chapter blocks the start; the river chapter streams in behind it
+    // (it is not on screen before the cloud dive at F ≈ 0.37).
+    try { await loadChapter('orbit'); } catch (e) { console.warn('[film] orbit failed:', e?.message || e); }
+    const riverLoad = loadChapter('river').catch((e) => console.warn('[film] river failed:', e?.message || e));
+    if (!chapters.orbit) { await riverLoad; if (!chapters.river) throw new Error('No film chapters available'); }
     clock.update();
-    for (const f of [0, 0.41, 0.6]) { target = F = f; frame(); }
-    target = F = 0;
+    target = F = 0; frame();
     renderer.setAnimationLoop(frame);
   })();
 
