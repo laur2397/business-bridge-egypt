@@ -1,5 +1,5 @@
 const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/orbit-B75Lqpr-.js","assets/UnrealBloomPass-C28B2YMj.js","assets/river-CiP8Ed_4.js"])))=>i.map(i=>d[i]);
-import{F as e,J as t,N as n,Q as r,U as i,W as a,_t as o,a as s,at as c,c as l,ft as u,gt as d,i as f,k as p,m as ee,n as te,ot as m,p as ne,t as h,yt as g,z as _}from"./UnrealBloomPass-C28B2YMj.js";import{t as v}from"./assets-ok17D2jF.js";import{t as y}from"./main-DYDyfpYH.js";var b=`
+import{F as e,J as t,N as n,Q as r,U as i,W as a,_t as o,a as s,at as c,c as l,ft as u,gt as d,i as f,k as p,m as ee,n as te,ot as m,p as ne,t as h,yt as g,z as _}from"./UnrealBloomPass-C28B2YMj.js";import{t as v}from"./assets-ok17D2jF.js";import{t as y}from"./main-CKOnI-jN.js";var b=`
   varying vec2 vUv;
   void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
 `,x=`
