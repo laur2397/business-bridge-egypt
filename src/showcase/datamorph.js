@@ -66,7 +66,7 @@ export function createDataMorph(container, { quality = 'high' } = {}) {
   const reduced = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
-  const maxPR = low ? 1 : 1.75;
+  const maxPR = low ? 0.85 : 1.25;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPR));
   renderer.setClearColor(0x000000, 1);
   renderer.toneMapping = THREE.NoToneMapping;
@@ -295,9 +295,11 @@ export function createDataMorph(container, { quality = 'high' } = {}) {
     fin.uniforms.uTime.value = clock;
   }
 
+  const minFrameMs = low ? 1000 / 31 : 0; // weak GPUs: steady 30 fps
   function frame(now) {
     raf = 0;
     if (!running()) return;
+    if (minFrameMs && last && now - last < minFrameMs) { raf = requestAnimationFrame(frame); return; }
     const dt = last ? Math.min(1 / 30, Math.max(1 / 240, (now - last) / 1000)) : 1 / 60;
     last = now;
     step(dt);

@@ -47,7 +47,11 @@ export function createFilm(container, { quality = 'high', reduced = false, onPro
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance', stencil: false });
   // Start at 1.0 (Retina screens would otherwise render 2.25x the pixels); adapt up only if frames are fast.
   const maxPR = quality === 'high' ? Math.min(window.devicePixelRatio || 1, 1.25) : 1;
-  let pixelRatio = Math.min(1, maxPR);
+  // Weak GPUs (quality 'low') start at a reduced internal resolution; film grain hides the upscale.
+  let pixelRatio = quality === 'low' ? 0.7 : Math.min(1, maxPR);
+  // Weak GPUs: render the 3D film at a steady 30 fps, so the page itself keeps scrolling at 60.
+  const FRAME_CAP = quality === 'low' ? 1 / 31 : 0;
+  let frameAcc = 0;
   renderer.setPixelRatio(pixelRatio);
   renderer.toneMapping = THREE.NoToneMapping;
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
@@ -174,8 +178,9 @@ export function createFilm(container, { quality = 'high', reduced = false, onPro
   // Adaptive resolution
   let slowFrames = 0, fastFrames = 0;
   function adapt(dt) {
-    if (dt > 1 / 42) { slowFrames++; fastFrames = 0; } else if (dt < 1 / 58) { fastFrames++; slowFrames = Math.max(0, slowFrames - 1); }
-    if (slowFrames > 24 && pixelRatio > 0.6) { pixelRatio = Math.max(0.6, pixelRatio - 0.15); slowFrames = 0; resize(); }
+    const slowAt = FRAME_CAP ? 1 / 26 : 1 / 42, fastAt = FRAME_CAP ? 1 / 30.5 : 1 / 58;
+    if (dt > slowAt) { slowFrames++; fastFrames = 0; } else if (dt < fastAt) { fastFrames++; slowFrames = Math.max(0, slowFrames - 1); }
+    if (slowFrames > 24 && pixelRatio > 0.5) { pixelRatio = Math.max(0.5, pixelRatio - 0.1); slowFrames = 0; resize(); }
     if (fastFrames > 240 && pixelRatio < Math.min(window.devicePixelRatio || 1, maxPR)) { pixelRatio = Math.min(maxPR, pixelRatio + 0.1); fastFrames = 0; resize(); }
   }
 
@@ -196,8 +201,11 @@ export function createFilm(container, { quality = 'high', reduced = false, onPro
   let time = 0;
 
   function frame() {
-    clock.update(); const dt = Math.min(clock.getDelta(), 0.1);
+    clock.update();
+    let dt = clock.getDelta();
     if (!running || !visible) return;
+    if (FRAME_CAP) { frameAcc += dt; if (frameAcc < FRAME_CAP) return; dt = frameAcc; frameAcc = 0; }
+    dt = Math.min(dt, 0.1);
     time += dt;
     adapt(dt);
 

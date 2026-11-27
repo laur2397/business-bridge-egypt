@@ -745,7 +745,7 @@ export function createBridgeBuild(container, { quality = 'high' } = {}) {
     stage.render(dt, time);
   }
 
-  const loop = createLoop(container, frame);
+  const loop = createLoop(container, frame, { maxFps: quality === 'low' ? 30 : 0 });
   let disposed = false;
   const assets = createAssets(renderer);
   const ready = (async () => {

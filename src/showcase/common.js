@@ -157,7 +157,7 @@ export function createStage(container, { quality = 'high', exposure = 1, bloom =
 /**
  * Animation loop with visibility handling: pauses offscreen (IntersectionObserver), on hidden tab, and on pause().
  */
-export function createLoop(container, tick) {
+export function createLoop(container, tick, { maxFps = 0 } = {}) {
   let raf = 0;
   let last = 0;
   let onscreen = true;
@@ -165,8 +165,10 @@ export function createLoop(container, tick) {
   let running = false;
   const t0 = performance.now();
 
+  const minDt = maxFps ? 1000 / (maxFps + 1) : 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
+    if (minDt && last && now - last < minDt) return; // frame cap for weak GPUs
     const dt = Math.min(0.1, last ? (now - last) / 1000 : 1 / 60);
     last = now;
     tick(dt, (now - t0) / 1000);
