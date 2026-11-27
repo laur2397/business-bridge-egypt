@@ -81,7 +81,7 @@
 .card__sub { margin-top: 24px; color: rgba(244, 239, 230, .84); text-shadow: 0 1px 24px rgba(0, 0, 0, .6); max-width: 30em; }
 /* readability scrim */
 .card::before { content: ''; position: absolute; inset: -18% -22%; z-index: -2; pointer-events: none;
-  background: radial-gradient(closest-side, rgba(3, 7, 15, .6), rgba(3, 7, 15, .3) 55%, transparent); filter: blur(10px); }
+  background: radial-gradient(closest-side, rgba(3, 7, 15, .6), rgba(3, 7, 15, .3) 55%, rgba(3, 7, 15, .08) 80%, transparent); }
 .card--finale::before { background: radial-gradient(closest-side, rgba(3, 7, 15, .35), transparent); }
 
 .card--hero { left: var(--pad); right: var(--pad); bottom: calc(var(--lb) + clamp(54px, 9vh, 110px)); max-width: none; }
@@ -101,7 +101,7 @@
 
 /* ink cards: dark ink on the bright frames */
 .card--ink { color: #17130e; }
-.card--ink::before { background: radial-gradient(closest-side, rgba(255, 246, 232, .34), rgba(255, 246, 232, .14) 60%, transparent); filter: blur(14px); }
+.card--ink::before { background: radial-gradient(closest-side, rgba(255, 246, 232, .34), rgba(255, 246, 232, .14) 60%, rgba(255, 246, 232, .04) 82%, transparent); }
 .card--ink .card__title, .card--ink .card__coords { text-shadow: 0 0 40px rgba(255, 244, 228, .55); }
 .card--ink .card__kick { color: rgba(40, 28, 14, .8); }
 .card--ink .card__kick b, .card--ink .t-disp em { color: #7a4f1d; }

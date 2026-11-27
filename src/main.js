@@ -27,6 +27,7 @@ const gpuName = (() => {
 const weakGpu = /intel|swiftshader|llvmpipe|mali|adreno|powervr/i.test(gpuName);
 const quality = coarse || weakGpu || window.innerWidth < 900 || (navigator.hardwareConcurrency || 8) <= 4 ? 'low' : 'high';
 if (reduced) document.documentElement.classList.add('reduced');
+if (quality === 'low') document.documentElement.classList.add('q-low');
 document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -124,15 +125,15 @@ function birth(chars, { delay = 0, stagger = 0.022, duration = 1.35, from = 'sta
   const wd = targetWidth(chars[0]);
   gsap.killTweensOf(chars);
   return gsap.fromTo(chars,
-    { '--wd': 62, opacity: 0, filter: 'blur(12px)', yPercent: 22 },
-    { '--wd': wd, opacity: 1, filter: 'blur(0px)', yPercent: 0, duration, ease: 'expo.out', delay, stagger: { each: stagger, from },
+    { '--wd': 62, opacity: 0, filter: quality === 'low' ? 'none' : 'blur(12px)', yPercent: 22 },
+    { '--wd': wd, opacity: 1, filter: quality === 'low' ? 'none' : 'blur(0px)', yPercent: 0, duration, ease: 'expo.out', delay, stagger: { each: stagger, from },
       onComplete: () => chars.forEach((c) => { c.style.removeProperty('--wd'); c.style.filter = ''; }) });
 }
 function unbirth(chars, { duration = 0.55 } = {}) {
   if (!chars.length) return null;
   gsap.killTweensOf(chars);
   if (reduced) { gsap.set(chars, { opacity: 0 }); return null; }
-  return gsap.to(chars, { '--wd': 62, opacity: 0, filter: 'blur(10px)', yPercent: -14, duration, ease: 'power2.in', stagger: { each: 0.006, from: 'end' } });
+  return gsap.to(chars, { '--wd': 62, opacity: 0, filter: quality === 'low' ? 'none' : 'blur(10px)', yPercent: -14, duration, ease: 'power2.in', stagger: { each: 0.006, from: 'end' } });
 }
 
 /* ================================================================== */

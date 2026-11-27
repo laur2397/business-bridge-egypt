@@ -149,7 +149,7 @@ ol, ul { padding: 0; list-style: none; }
 .lead { font-size: var(--t-lead); line-height: 1.5; color: var(--ivory-dim); max-width: 34em; font-variation-settings: "wdth" 100, "wght" 380; }
 
 /* character splitting */
-.char { display: inline-block; will-change: transform, filter, opacity; }
+.char { display: inline-block; }
 .w { display: inline-block; white-space: nowrap; }
 
 /* ==================================================================
@@ -576,3 +576,8 @@ section { position: relative; }
 
 /* keep the nav on one line on mid-size screens */
 @media (max-width: 1320px) { .nav__now { display: none; } }
+
+/* Weak GPUs: drop the costly full-screen CSS effects (the WebGL film already adds its own grain). */
+.q-low .grain { display: none; }
+.q-low .nav.is-scrolled, .q-low .holdring::before, .q-low .sound { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.q-low .nav.is-scrolled { background: rgba(5, 11, 26, .94); }
